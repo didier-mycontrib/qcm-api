@@ -9,7 +9,7 @@ pipeline {
 		}
 		stage('Checkout code') {
 			steps {
-			   ws("/conf-docker/backend-qcm/qcm-api") {
+			   ws("/docker-contents/qcm-api") {
 				  checkout scm
 			   }
 			}
