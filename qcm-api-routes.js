@@ -99,6 +99,12 @@ apiRouter.route('/qcm-api/public/qcm')
 
 var tabResNumFromIndex  = [ 'a' , 'b' , 'c' , 'd' , 'e' , 'f' ,'g' , 'h'];
 
+class SolutionObject {
+	constructor(num,goodAnswerNums ){
+		this.num=num;
+		this.goodAnswerNums=goodAnswerNums;
+	}
+}
 
 function ajustSolutionsInQcm(qcm){
     qcm.solutions=[];
@@ -131,15 +137,18 @@ apiRouter.route('/qcm-api/private/qcm')
 });
 
 // .../qcm-api/private/qcm en mode put
-apiRouter.route('/qcm-api/private/qcm')
+apiRouter.route('/qcm-api/private/qcm/:id')
 .put(async function(req , res  , next ) {
+	var idRes = req.params.id;
 	var qcm = req.body;
-    console.log("update  qcm :" +JSON.stringify(qcm));
+	qcm.id = idRes;
+    console.log("update  qcm of id=" +idRes + ":" +JSON.stringify(qcm));
 	try{
 		ajustSolutionsInQcm(qcm);
 		let updatedqcm = await qcmDao.updateOne(qcm);
 		res.send(updatedqcm);
     } catch(ex){
+		console.log("ex:"+ex);
 	    res.status(statusCodeFromEx(ex)).send(ex);
     }
 });
