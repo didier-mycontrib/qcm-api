@@ -3,16 +3,20 @@
   "version": "1.0.0",
   "description": "micro-service  qcm-api (qcm , results).",
   "main": "server.js",
-  "type" : "module", 
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-	"start": "node server.js"
+    "test": "mocha --reporter spec",
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^5.1.0",
-    "mongoose": "^8.17.1",
-    "express-fileupload": "^1.5.2"
+    "express-fileupload": "^1.5.2",
+    "mongoose": "^8.17.1"
+  },
+  "devDependencies": {
+    "chai": "^5.2.1",
+    "mocha": "^11.7.1"
   }
 }
