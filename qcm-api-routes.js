@@ -31,6 +31,7 @@ apiRouter.route('/qcm-api/private/reinit')
 		let doneActionMessage = await qcmDao.reinit_db();
 		res.send(doneActionMessage);
     } catch(ex){
+		console.log("ex:"+ex)
 	    res.status(statusCodeFromEx(ex)).send(ex);
     } 
 });
@@ -93,6 +94,7 @@ apiRouter.route('/qcm-api/public/qcm')
 		qcms.forEach((qcm)=>{qcm.questions=null; qcm.solutions=null;});
 		res.send(qcms);
     } catch(ex){
+		console.log("ex="+ex)
 	    res.status(statusCodeFromEx(ex)).send(ex);
     } 
 });

@@ -1,12 +1,10 @@
-FROM node:18
-# this new image will be create from parent image = node:18 (stable)
+FROM node:22
+# this new image will be create from parent image = node:22 (stable)
 
 # Create app directory inside docker image
 WORKDIR /usr/src/app
 
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
 COPY  package*.json  ./
 
 RUN npm install

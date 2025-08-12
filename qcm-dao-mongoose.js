@@ -95,15 +95,12 @@ setSubSchemaWithoutIdNorVersionKey(questionSchema);
 
 initMongooseWithSchemaAndModel();
 
-function reinit_db(){
-  return new Promise( (resolve,reject)=>{
+async function reinit_db(){
+    try {
       const deleteAllFilter = { }
-      ThisPersistentModel.deleteMany( deleteAllFilter, function (err) {
-        if(err) { 
-          console.log(JSON.stringify(err));
-          reject(err);
-        }
-        (new ThisPersistentModel({ _id : "6215ef77a8f36f4037eeef0d" ,
+      await ThisPersistentModel.deleteMany( deleteAllFilter);
+      //console.log("old qcms deleted");
+      await (new ThisPersistentModel({ _id : "6215ef77a8f36f4037eeef0d" ,
                 title : "qcm1" , keywords : [ "js" ] , visibility : "public" , purpose : "training",
                 ownerId: null , authorId : null ,nbQuestions : 2 , 
                 questions : [{ num : 1 , question : "let or var or ... for local?",
@@ -124,7 +121,8 @@ function reinit_db(){
                               {num:2 ,goodAnswerNums : ['c'] }
                             ]}
          )).save();
-         (new ThisPersistentModel({ _id : "6215ef77a8f36f4037eeef0f" ,
+         //console.log("qcm1 saved")
+         await (new ThisPersistentModel({ _id : "6215ef77a8f36f4037eeef0f" ,
           title : "qcm2" , keywords : [ "java" ] , visibility : "public" , purpose : "eval",
           ownerId: null , authorId : null ,nbQuestions : 2 , 
           questions : [{ num : 1 , question : "keyword for inheritance ?",
@@ -145,11 +143,12 @@ function reinit_db(){
                         {num:2 ,goodAnswerNums : ['d'] }
                       ]}
    )).save();
-        
-        resolve({action:"qcms collection in database re-initialized"})
-      })
- 
-  });
+    //console.log("qcm2 saved")
+    return {action:"qcms collection in database re-initialized"}; //as Promise
+  } catch(ex){
+     console.log(JSON.stringify(ex));
+     throw ex;
+  }
 }
 
 function findById(id) {

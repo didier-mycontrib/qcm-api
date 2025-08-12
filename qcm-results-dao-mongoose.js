@@ -85,15 +85,11 @@ setSubSchemaWithoutIdNorVersionKey(qcmPerformerSchema);
 
 initMongooseWithSchemaAndModel();
 
-function reinit_db(){
-  return new Promise( (resolve,reject)=>{
+async function reinit_db(){
+   try {
       const deleteAllFilter = { }
-      ThisPersistentModel.deleteMany( deleteAllFilter, function (err) {
-        if(err) { 
-          console.log(JSON.stringify(err));
-          reject(err);
-        }
-        (new ThisPersistentModel({ _id : "621607cd5adc0f2365d8955c" , 
+      await ThisPersistentModel.deleteMany( deleteAllFilter);
+      await (new ThisPersistentModel({ _id : "621607cd5adc0f2365d8955c" , 
                 qcmId : "6215ef77a8f36f4037eeef0d" ,
                 performer : { fullName : "jean Bon" , 
                               email : "jean.Bon@xyz.com",
@@ -104,11 +100,11 @@ function reinit_db(){
                globalResults : { percentageScore : 50 ,nbGoodResponses : 1}
               }
          )).save();
-         
-        resolve({action:"qcmResults collection in database re-initialized"})
-      })
- 
-  });
+        return {action:"qcmResults collection in database re-initialized"}
+   } catch(ex){
+     console.log(JSON.stringify(ex));
+     throw ex;
+  }
 }
 
 function findById(id) {
