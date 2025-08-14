@@ -23,10 +23,12 @@ describe("rest qcm-api tests", ()=>{
 
 
 	before(async () =>{
-
-mongodbContainer = new MongoDBContainer("mongo:8.0.12").start()
-        .then((mongodbContainer)=>{ console.log("mdb:"+mongodbContainer.getConnectionString());})
-        .catch((err)=>console.log(err))
+try{
+mongodbContainer = await new MongoDBContainer("mongo:8.0.12").start()
+  console.log("mdb:"+mongodbContainer.getConnectionString());
+}catch(ex){
+  console.log("err start mongodbContainer:"+ex)
+}
 
      console.log("initialisations before all tests of qcm-api.spec (dataset or ...)");
     //insertion d'un jeu de données via http call:
