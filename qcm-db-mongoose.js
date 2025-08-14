@@ -5,7 +5,7 @@ function thisDbFn(){
    let mongoDbUrl = process.env.MONGODB_URL || "mongodb://127.0.0.1:27017"; //by default
    let cnxOptions = {}
    if(process.env.TEST_MODE=="IT"){
-      cnxOptions = { directConnection: true }
+      cnxOptions = { directConnection: true , dbName : 'qcm_db' }
     }
     else{
       cnxOptions = { dbName : 'qcm_db'}
