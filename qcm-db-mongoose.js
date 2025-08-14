@@ -10,7 +10,6 @@ function thisDbFn(){
     else{
       cnxOptions = { dbName : 'qcm_db'}
     }
-    }
 
    console.log("mongoDbUrl="+mongoDbUrl);
    mongoose.connect(mongoDbUrl, { dbName : 'qcm_db'});
