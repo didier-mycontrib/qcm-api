@@ -38,7 +38,7 @@ it("basic mongoose test with @testcontainers/mongodb", async () =>{
 
     const result = await collection.findOne({ value: 1 });
     console.log(JSON.stringify(result));
-    expect(result).to.equal(obj);
+    expect(result.value).to.equal(obj.value);
 
     await db.close();
    });
