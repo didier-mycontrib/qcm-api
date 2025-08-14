@@ -44,7 +44,7 @@ describe("rest qcm-api tests", ()=>{
 
   
 	before(async () =>{
-     mongodbContainer=initMongodbContainer(); //utile seulement en mode IT (avec jenkins ou ...)
+     mongodbContainer=await initMongodbContainer(); //utile seulement en mode IT (avec jenkins ou ...)
   
      console.log("initialisations before all tests of qcm-api.spec (dataset or ...)");
     //insertion d'un jeu de données via http call:
