@@ -20,4 +20,5 @@ MongooseError: Model.deleteMany() no longer accepts a callback
                …
 ==> impact : changer generic-promise-mongoose avec async/await
              et changer reinit…() dans ...-dao-mongoose avec async/await
-
+====
+TEST_MODE=IT pour testcontainers
