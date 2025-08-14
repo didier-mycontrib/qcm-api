@@ -38,6 +38,7 @@ pipeline {
 	stage('build_docker_image') {
 	     steps {
 		     script{ 
+				echo "building docker image " + docker_image_name
 			      //dockerImage = docker.build(docker_image_name)
 			    }
 		    } 
