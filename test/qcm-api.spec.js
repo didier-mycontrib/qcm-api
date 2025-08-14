@@ -49,7 +49,7 @@ mongodbContainer = await new MongoDBContainer("mongo:8.0.12").start()
                      .send(qcmA);
       qcmA.id = resPostQcmA.body.id ;
       console.log("qcmA added in database/dataset with id="+qcmA.id)
-  });
+  }).timeout(120000);
 
   after(async ()=>{
     const requester = retreiveMyAppRequester();
