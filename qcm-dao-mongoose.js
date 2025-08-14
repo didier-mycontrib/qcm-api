@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import qcmDbMongoose from './qcm-db-mongoose.js';
 import genericPromiseMongoose from './generic-promise-mongoose.js';
-var thisDb = qcmDbMongoose.thisDb;
+
 
 //NB: This is for current entity type ("Devise" or "Customer" or "Product" or ...)
 //NB: thisSchema and ThisPersistentModel should not be exported (private only in this current module)
@@ -17,7 +17,7 @@ function setSubSchemaWithoutIdNorVersionKey(schema){
 }
 
 function initMongooseWithSchemaAndModel () {
-  mongoose.Connection = thisDb;
+  mongoose.Connection = qcmDbMongoose.thisDbFn();
 
 /*
 Answer (too choose):
@@ -93,14 +93,19 @@ setSubSchemaWithoutIdNorVersionKey(questionSchema);
       ThisPersistentModel = mongoose.model('Qcm', thisSchema);
 }
 
-initMongooseWithSchemaAndModel();
+function ThisPersistentModelFn(){
+  if(ThisPersistentModel==null)
+      initMongooseWithSchemaAndModel();
+  return ThisPersistentModel;
+}
+
 
 async function reinit_db(){
     try {
       const deleteAllFilter = { }
-      await ThisPersistentModel.deleteMany( deleteAllFilter);
+      await ThisPersistentModelFn().deleteMany( deleteAllFilter);
       //console.log("old qcms deleted");
-      await (new ThisPersistentModel({ _id : "6215ef77a8f36f4037eeef0d" ,
+      await (new ThisPersistentModelFn()({ _id : "6215ef77a8f36f4037eeef0d" ,
                 title : "qcm1" , keywords : [ "js" ] , visibility : "public" , purpose : "training",
                 ownerId: null , authorId : null ,nbQuestions : 2 , 
                 questions : [{ num : 1 , question : "let or var or ... for local?",
@@ -122,7 +127,7 @@ async function reinit_db(){
                             ]}
          )).save();
          //console.log("qcm1 saved")
-         await (new ThisPersistentModel({ _id : "6215ef77a8f36f4037eeef0f" ,
+         await (new ThisPersistentModelFn()({ _id : "6215ef77a8f36f4037eeef0f" ,
           title : "qcm2" , keywords : [ "java" ] , visibility : "public" , purpose : "eval",
           ownerId: null , authorId : null ,nbQuestions : 2 , 
           questions : [{ num : 1 , question : "keyword for inheritance ?",
@@ -152,28 +157,28 @@ async function reinit_db(){
 }
 
 function findById(id) {
-  return genericPromiseMongoose.findByIdWithModel(id,ThisPersistentModel);
+  return genericPromiseMongoose.findByIdWithModel(id,ThisPersistentModelFn());
 }
 
 //exemple of criteria : {} or { unitPrice: { $gte: 25 } } or ...
 function findByCriteria(criteria) {
-  return genericPromiseMongoose.findByCriteriaWithModel(criteria,ThisPersistentModel);
+  return genericPromiseMongoose.findByCriteriaWithModel(criteria,ThisPersistentModelFn());
 }
 
 function save(entity) {
-  return genericPromiseMongoose.saveWithModel(entity,ThisPersistentModel);
+  return genericPromiseMongoose.saveWithModel(entity,ThisPersistentModelFn());
 }
 
 function updateOne(newValueOfEntityToUpdate) {
-  return genericPromiseMongoose.updateOneWithModel(newValueOfEntityToUpdate,newValueOfEntityToUpdate.id,ThisPersistentModel);
+  return genericPromiseMongoose.updateOneWithModel(newValueOfEntityToUpdate,newValueOfEntityToUpdate.id,ThisPersistentModelFn());
 }
 
 function deleteOne(idOfEntityToDelete) {
-  return genericPromiseMongoose.deleteOneWithModel(idOfEntityToDelete,ThisPersistentModel);
+  return genericPromiseMongoose.deleteOneWithModel(idOfEntityToDelete,ThisPersistentModelFn());
 }
 
-
-export default { ThisPersistentModel ,  reinit_db ,
+//old static ThisPersistentModel now replaced by dynamic ThisPersistentModelFn() 
+export default { ThisPersistentModelFn ,  reinit_db ,
    findById , findByCriteria , save , updateOne ,  deleteOne};
 
    /*

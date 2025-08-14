@@ -3,7 +3,7 @@ const apiRouter = express.Router();
 
 import qcmResultsDao from './qcm-results-dao-mongoose.js';//mainDao
 import qcmDao from './qcm-dao-mongoose.js';//secondary dao
-var PersistentQcmResultsModel = qcmResultsDao.ThisPersistentModel; //to use only for specific extra request (not in dao)
+//qcmResultsDao.ThisPersistentModelFn(); //to use only for specific extra request (not in dao)
 
 
 function statusCodeFromEx(ex){

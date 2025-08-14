@@ -2,7 +2,7 @@ import express from 'express';
 const apiRouter = express.Router();
 
 import qcmDao from './qcm-dao-mongoose.js';
-var PersistentSessionModel = qcmDao.ThisPersistentModel; //to use only for specific extra request (not in dao)
+//qcmDao.ThisPersistentModelFn(); //to use only for specific extra request (not in dao)
 
 
 function statusCodeFromEx(ex){

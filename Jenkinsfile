@@ -27,7 +27,8 @@ pipeline {
     }
       stage('Test') {
             steps {
-                echo 'lancement de tests unitaires: '
+                echo 'lancement de tests unitaires et integration '
+				sh export TEST_MODE='IT'
                 sh 'npm run test'
 
             }

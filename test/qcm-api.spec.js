@@ -23,13 +23,16 @@ describe("rest qcm-api tests", ()=>{
 
 
 	before(async () =>{
-try{
-mongodbContainer = await new MongoDBContainer("mongo:8.0.12").start()
-  console.log("mdb:"+mongodbContainer.getConnectionString());
-  process.env.MONGODB_URL=mongodbContainer.getConnectionString()
-}catch(ex){
-  console.log("err start mongodbContainer:"+ex)
-}
+     if(process.env.TEST_MODE=="IT"){
+        try{
+          mongodbContainer = await new MongoDBContainer("mongo:8.0.12").start()
+          console.log("mdb:"+mongodbContainer.getConnectionString());
+          process.env.MONGODB_URL=mongodbContainer.getConnectionString()
+        }catch(ex){
+          console.log("err start mongodbContainer:"+ex)
+        }
+     }
+   
 
      console.log("initialisations before all tests of qcm-api.spec (dataset or ...)");
     //insertion d'un jeu de données via http call:
@@ -57,6 +60,11 @@ mongodbContainer = await new MongoDBContainer("mongo:8.0.12").start()
     console.log("terminaison after all tests of qcm-api.spec ");
     //delete dataset
      const resDeleteQcmA = await requester.delete('/qcm-api/private/qcm/'+qcmA.id)
+
+     if(process.env.TEST_MODE=="IT"){
+      //stop mongodbContainer (in integration test mode):
+     await mongodbContainer.stop();
+     }
   });
 	
 it("/qcm-api/public/qcm , status 200 and at least one qcm", async () =>{
