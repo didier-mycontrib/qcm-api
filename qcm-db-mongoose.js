@@ -3,7 +3,14 @@ import mongoose from 'mongoose';
 function thisDbFn(){
 
    let mongoDbUrl = process.env.MONGODB_URL || "mongodb://127.0.0.1:27017"; //by default
-
+   let cnxOptions = {}
+   if(process.env.TEST_MODE=="IT"){
+      cnxOptions = { directConnection: true }
+    }
+    else{
+      cnxOptions = { dbName : 'qcm_db'}
+    }
+    }
 
    console.log("mongoDbUrl="+mongoDbUrl);
    mongoose.connect(mongoDbUrl, { dbName : 'qcm_db'});
