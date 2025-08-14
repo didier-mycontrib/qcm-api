@@ -1,6 +1,7 @@
 import {use} from  'chai';
 import chaiHttp  from 'chai-http';
 import { app , server } from '../server.js';
+import { MongoDBContainer } from '@testcontainers/mongodb'
 
 
 const chai=use(chaiHttp); //configure chai to use chaiHttp
@@ -18,8 +19,15 @@ describe("rest qcm-api tests", ()=>{
   
   let qcmA =null; //part of data-set
 
+  let mongodbContainer=null;//for integration-test (in jenkins or ...)
+
 
 	before(async () =>{
+
+mongodbContainer = new MongoDBContainer("mongo:8.0.12").start()
+        .then((mongodbContainer)=>{ console.log("mdb:"+mongodbContainer.getConnectionString());})
+        .catch((err)=>console.log(err))
+
      console.log("initialisations before all tests of qcm-api.spec (dataset or ...)");
     //insertion d'un jeu de données via http call:
 	

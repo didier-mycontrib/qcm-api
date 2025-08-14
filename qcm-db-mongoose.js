@@ -18,6 +18,7 @@ var thisDb  = mongoose.connection;
 thisDb.on('error' , function() { 
       console.log("mongoDb connection error = " + " for dbUrl=" + mongoDbUrl )
       //second chance:
+      /*
       //start mongodbContainer (in integration test mode):
       if(mongodbContainer==null){
         mongodbContainer = new MongoDBContainer("mongo:8.0.12").start()
@@ -27,7 +28,7 @@ thisDb.on('error' , function() {
            mongoose.connect(mongodbContainer.getConnectionString(), { dbName : 'qcm_db'});
            thisDb  = mongoose.connection;
         }
-      }
+      }*/
     });
 
 thisDb.once('open', function() {
