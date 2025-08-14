@@ -13,6 +13,9 @@ pipeline {
 		docker_registry= 'https://registry.hub.docker.com'
 		
 		docker_image_name='didierdefrance69/qcm_api:1'
+
+        //for "Integration Test" avec @testcontainers/mongodb
+		TEST_MODE="IT"
 	}
 
     stages {
@@ -28,7 +31,7 @@ pipeline {
       stage('Test') {
             steps {
                 echo 'lancement de tests unitaires et integration '
-				sh export TEST_MODE='IT'
+				sh echo "TEST_MODE=${TEST_MODE}"
                 sh 'npm run test'
 
             }
