@@ -31,9 +31,8 @@ pipeline {
       stage('Test') {
             steps {
                 echo 'lancement de tests unitaires et integration '
-				sh echo "TEST_MODE=${TEST_MODE}"
+				echo "TEST_MODE=${TEST_MODE}"
                 sh 'npm run test'
-
             }
         }
 	stage('build_docker_image') {
