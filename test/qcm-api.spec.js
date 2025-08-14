@@ -26,6 +26,7 @@ describe("rest qcm-api tests", ()=>{
 try{
 mongodbContainer = await new MongoDBContainer("mongo:8.0.12").start()
   console.log("mdb:"+mongodbContainer.getConnectionString());
+  process.env.MONGODB_URL=mongodbContainer.getConnectionString()
 }catch(ex){
   console.log("err start mongodbContainer:"+ex)
 }
