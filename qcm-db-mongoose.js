@@ -12,7 +12,7 @@ function thisDbFn(){
     }
 
    console.log("mongoDbUrl="+mongoDbUrl);
-   mongoose.connect(mongoDbUrl, { dbName : 'qcm_db'});
+   mongoose.connect(mongoDbUrl, cnxOptions);
    var thisDb  = mongoose.connection;
 
     thisDb.on('error' , function() { 
