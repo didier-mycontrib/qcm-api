@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import  { expect } from 'chai'; //but not import chai from 'chai' !!!
 
 describe("my basic tests", ()=>{
 	

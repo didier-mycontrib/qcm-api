@@ -1,5 +1,5 @@
 import express from 'express';
-var app = express();
+export const app = express();
 
 import fileUpload  from 'express-fileupload';
 
@@ -48,6 +48,6 @@ app.use(qcmApiRoutes.apiRouter);// delegate REST API routes to apiRouter(s)
 app.use(qcmResultsApiRoutes.apiRouter);
 
 let backendPort = process.env.PORT || 8230; 
-app.listen(backendPort , function () {
+export const server = app.listen(backendPort , function () {
   console.log("http://localhost:"+backendPort);
 });
