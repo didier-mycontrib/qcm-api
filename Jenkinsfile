@@ -39,7 +39,7 @@ pipeline {
 	     steps {
 		     script{ 
 				echo "building docker image " + docker_image_name
-			      //dockerImage = docker.build(docker_image_name)
+			      dockerImage = docker.build(docker_image_name)
 			    }
 		    } 
 		}
@@ -48,9 +48,9 @@ pipeline {
 			  script{
 					echo "docker_registry=" + docker_registry
 					echo "dockerhub_credential_id=" +dockerhub_credential_id
-					//docker.withRegistry( docker_registry, dockerhub_credential_id ) { 
-					  //   dockerImage.push() 
-						// }
+					docker.withRegistry( docker_registry, dockerhub_credential_id ) { 
+					     dockerImage.push() 
+						 }
 					  }
 				  }
 		}
