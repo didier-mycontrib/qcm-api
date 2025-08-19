@@ -15,7 +15,8 @@ COPY .   .
 
 #setting ENV-VARIABLE
 ENV PORT=8230
-ENV MONGODB_URL=mongodb://root:root@mongoDB.host:27017
+#ENV MONGODB_URL=mongodb://root:root@mongoDB.host:27017
+#MONGODB_URL is now replaced by MONGODB_HOSTNAME + ... + ...
 
 EXPOSE 8230
 CMD [ "npm", "start" ]
