@@ -3,6 +3,9 @@ import chaiHttp  from 'chai-http';
 import { app , server } from '../server.js';
 import { MongoDBContainer } from '@testcontainers/mongodb'
 
+//NB: this test file will be globally used to test qcm-api AND qcm-results-api
+//because qcm-results depends of some existing qcm
+
 
 const chai=use(chaiHttp); //configure chai to use chaiHttp
 //NB: run mocha with --exit option for good server exit after test execution
@@ -84,6 +87,22 @@ describe("rest qcm-api tests", ()=>{
       expect(jsBody.keywords[0]).to.equal("js");
       //...
    });
+
+    it("post /qcm-api/public/qcm_choices  return status 200 ", async () =>{
+
+      let qcmAChoice1 = {qcmId:qcmA.id,
+        mode:"training",
+        qcmPerformer:{fullName:"",email:"",org:""},
+        choices:[{num:1,selectedAnswerNums:["d"]}]
+      };
+
+       const requester = retreiveMyAppRequester();
+       const resPostQcmAChoice1 = await requester.post('/qcm-api/public/qcm_choices')
+                     .send(qcmAChoice1);
+      expect(resPostQcmAChoice1).to.have.status(200);
+      //console.log("qcm_choices POST status=" + resPostQcmAChoice1.status);
+      console.log("qcm_choices POST result:="+ JSON.stringify(resPostQcmAChoice1.body))
+    });
 
 });
 

@@ -133,6 +133,7 @@ apiRouter.route('/qcm-api/public/qcm_choices')
     //building globalresults:
     qcmGlobalResult = buildResults(qcm,postChoicesRequest.choices);
     //storing results only if mode=eval:
+    let PersistentQcmResultsModel =qcmResultsDao.ThisPersistentModelFn();
     let qcmResults = new  PersistentQcmResultsModel( { _id  : null,
 		                                  performer : postChoicesRequest.qcmPerformer,
                                           qcmId : postChoicesRequest.qcmId,
@@ -158,6 +159,7 @@ apiRouter.route('/qcm-api/public/qcm_choices')
 	}
 	res.send(postChoicesResponse);
    } catch(ex){
+        console.log("exception in post /qcm-api/public/qcm_choices" + ex)
 	    res.status(statusCodeFromEx(ex)).send(ex);
    }
 });
