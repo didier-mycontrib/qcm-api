@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import fs from 'fs/promises';
 
 async function readBasicTextFile(fileName){
-	let data = await fs.readFile(fileName);
+	let data = await fs.readFile(fileName, 'utf8');
 	return data;
 }
 
@@ -33,7 +33,8 @@ async function thisDbFn(){
     }
 	
 	if(mongoDbUsername && mongoDbPassword){
-		cnxOptions.auth = { username :mongoDbUsername , password: mongoDbPassword};
+		console.log("mongoDbPassword = " + mongoDbPassword);
+		cnxOptions.auth = { username : mongoDbUsername , password : mongoDbPassword };
 		console.log("cnxOptions.auth= " + JSON.stringify(cnxOptions.auth));
 	}
 
