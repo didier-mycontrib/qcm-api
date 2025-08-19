@@ -22,7 +22,7 @@ async function thisDbFn(){
 	   //MONGODB_PASSWORD_FILE est une variable d'env plus prioritaire que MONGODB_PASSWORD
 	   console.log("password is stored in basic secret file:= " + mongoDbPasswordFile);
 	   mongoDbPassword = await readBasicTextFile(mongoDbPasswordFile);
-	   console.log("mongoDbPassword (read from file)= " + mongoDbPassword);
+	   //console.log("mongoDbPassword (read from file)= " + mongoDbPassword);
    }
    console.log("mongoDbUrl="+mongoDbUrl);
    let cnxOptions = {}
@@ -34,9 +34,9 @@ async function thisDbFn(){
     }
 	
 	if(mongoDbUsername && mongoDbPassword){
-		console.log("mongoDbPassword = " + mongoDbPassword);
+		//console.log("mongoDbPassword = " + mongoDbPassword);
 		cnxOptions.auth = { username : mongoDbUsername , password : mongoDbPassword };
-		console.log("cnxOptions.auth= " + JSON.stringify(cnxOptions.auth));
+		//console.log("cnxOptions.auth= " + JSON.stringify(cnxOptions.auth));
 	}
 
    
