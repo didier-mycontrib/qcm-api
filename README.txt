@@ -31,3 +31,7 @@ https://medium.com/@anna.burlyaeva/integration-tests-for-node-js-apps-with-mysql
 https://testcontainers.com/modules/mongodb/?language=nodejs
 https://testcontainers.com/guides/getting-started-with-testcontainers-for-nodejs/
 
+//NB: le fichier www-d-defrance-fr-chain.pem à la racine du projet est nécessaire 
+//pour une bonne communication avec keycloak 
+//et ce fichier doit être réactualisé tous les ans (après réactualisation du certificat ssl)
+
