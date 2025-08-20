@@ -28,7 +28,7 @@ async function initQcmADataSet(){
       solutions:[]}; //end of qcmA
 
       const requester = retreiveMyAppRequester();
-      const resPostQcmA = await requester.post('/qcm-api/private/qcm')
+      const resPostQcmA = await requester.post('/qcm-api/v1/private/qcm')
                      .send(qcmA);
       qcmA.id = resPostQcmA.body.id ;
       //console.log("qcmA added in database/dataset with id="+qcmA.id)
@@ -38,7 +38,7 @@ async function initQcmADataSet(){
 //REMOVE qcmA dataSet after end of all tests
 async function removeQcmADataSet(qcmA){
      const requester = retreiveMyAppRequester();
-     const resDeleteQcmA = await requester.delete('/qcm-api/private/qcm/'+qcmA.id)
+     const resDeleteQcmA = await requester.delete('/qcm-api/v1/private/qcm/'+qcmA.id)
      console.log("data set remove at end of all tests")
 }
 
@@ -70,19 +70,19 @@ describe("rest qcm-api tests", ()=>{
      }
   });
 	
- it("/qcm-api/public/qcm , status 200 and at least one qcm", async () =>{
+ it("/qcm-api/v1/public/qcm , status 200 and at least one qcm", async () =>{
       const requester = retreiveMyAppRequester();
-      const res = await requester.get('/qcm-api/public/qcm');
+      const res = await requester.get('/qcm-api/v1/public/qcm');
       expect(res).to.have.status(200);
       let jsBody = res.body;//as array of qcm
       //console.log("qcm list"+JSON.stringify(jsBody));
       expect(jsBody.length).to.be.at.least(1);
    });
 
-   it("/qcm-api/private/qcm/idOfqcmA returns status 200 and good values of qcmA", async () =>{
+   it("/qcm-api/v1/private/qcm/idOfqcmA returns status 200 and good values of qcmA", async () =>{
     const requester = retreiveMyAppRequester();
       console.log("get qcmA.id="+qcmA.id);
-      const res = await requester.get('/qcm-api/private/qcm/'+qcmA.id);
+      const res = await requester.get('/qcm-api/v1/private/qcm/'+qcmA.id);
       expect(res).to.have.status(200);
       let jsBody = res.body;// qcm object
       console.log("reloaded values of qcmA=" +JSON.stringify(jsBody));
@@ -91,7 +91,7 @@ describe("rest qcm-api tests", ()=>{
       //...
    });
 
-    it("post /qcm-api/public/qcm_choices  return status 200 ", async () =>{
+    it("post /qcm-api/v1/public/qcm_choices  return status 201 ", async () =>{
 
       let qcmAChoice1 = {qcmId:qcmA.id,
         mode:"training",
@@ -100,9 +100,9 @@ describe("rest qcm-api tests", ()=>{
       };
 
        const requester = retreiveMyAppRequester();
-       const resPostQcmAChoice1 = await requester.post('/qcm-api/public/qcm_choices')
+       const resPostQcmAChoice1 = await requester.post('/qcm-api/v1/public/qcm_choices')
                      .send(qcmAChoice1);
-      expect(resPostQcmAChoice1).to.have.status(200);
+      expect(resPostQcmAChoice1).to.have.status(201);
       //console.log("qcm_choices POST status=" + resPostQcmAChoice1.status);
       console.log("qcm_choices POST result:="+ JSON.stringify(resPostQcmAChoice1.body))
     });

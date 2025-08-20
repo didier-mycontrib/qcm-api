@@ -8,12 +8,12 @@ import { statusCodeFromEx , nullOrEmptyObject } from "./generic-express-util.js"
 
 /*
 Nouvelle convention d'URL :
-http://localhost:8xxx/xyz-api/private/xyz en accès private (avec auth nécessaire)
-http://localhost:8xxx/xyz-api/public/xyz en accès public (sans auth nécessaire)
+http://localhost:8xxx/xyz-api/v1/private/xyz en accès private (avec auth nécessaire)
+http://localhost:8xxx/xyz-api/v1/public/xyz en accès public (sans auth nécessaire)
 */
 
-//exemple URL: .../qcm-api/private/reinit
-apiRouter.route(['/qcm-api/private/reinit','/qcm-api/v1/private/reinit'])
+//exemple URL: .../qcm-api/v1/private/reinit
+apiRouter.route('/qcm-api/v1/private/reinit')
 .get( async function(req , res  , next ) {
 	try{
 		let doneActionMessage = await qcmDao.reinit_db();
@@ -25,8 +25,8 @@ apiRouter.route(['/qcm-api/private/reinit','/qcm-api/v1/private/reinit'])
 });
 
 //(private version : return qcm with solutions)
-//exemple URL: .../qcm-api/public/qcm/6215ef77a8f36f4037eeef0f
-apiRouter.route(['/qcm-api/private/qcm/:id','/qcm-api/v1/private/qcm/:id'])
+//exemple URL: .../qcm-api/v1/public/qcm/6215ef77a8f36f4037eeef0f
+apiRouter.route('/qcm-api/v1/private/qcm/:id')
 .get( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	try{
@@ -39,8 +39,8 @@ apiRouter.route(['/qcm-api/private/qcm/:id','/qcm-api/v1/private/qcm/:id'])
 
 // version public : comme version privée 
 //mais retournant qcm avec questions seulement (pas les réponses)
-//exemple URL: .../qcm-api/public/qcm/6215ef77a8f36f4037eeef0f
-apiRouter.route(['/qcm-api/public/qcm/:id','/qcm-api/v1/public/qcm/:id'])
+//exemple URL: .../qcm-api/v1/public/qcm/6215ef77a8f36f4037eeef0f
+apiRouter.route('/qcm-api/v1/public/qcm/:id')
 .get( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	try{
@@ -53,9 +53,9 @@ apiRouter.route(['/qcm-api/public/qcm/:id','/qcm-api/v1/public/qcm/:id'])
 });
 
 // private version : return qcm array with all details (solutions )
-//exemple URL: .../qcm-api/private/qcm (returning all qcms)
-//             .../qcm-api/private/qcm?mode=training
-apiRouter.route(['/qcm-api/private/qcm','/qcm-api/v1/private/qcm'])
+//exemple URL: .../qcm-api/v1/private/qcm (returning all qcms)
+//             .../qcm-api/v1/private/qcm?mode=training
+apiRouter.route('/qcm-api/v1/private/qcm')
 .get( async function(req , res  , next ) {
 	let  mode = req.query.mode;
 	var criteria=mode?{purpose  : mode}:{};
@@ -71,7 +71,16 @@ apiRouter.route(['/qcm-api/private/qcm','/qcm-api/v1/private/qcm'])
 //et avec filtrages : ?mode=training or ?mode=eval
 // ?org=orgXyz ?session_code=codeXyz )
 //exemple URL: .../qcm-api/public/qcm (returning all qcms)
-apiRouter.route(['/qcm-api/public/qcm','/qcm-api/v1/public/qcm'])
+/**
+ * @openapi
+ * /qcm-api/v1/public/qcm:
+ *   get:
+ *     description: qcm list from criteria
+ *     responses:
+ *       200:
+ *         description: Returns qcm list
+ */
+apiRouter.route('/qcm-api/v1/public/qcm')
 .get( async function(req , res  , next ) {
 	let  mode = req.query.mode; //may be null/undefined
     //let  org = req.query.org; //may be null/undefined
@@ -112,8 +121,17 @@ function ajustSolutionsInQcm(qcm){
 }
 
 
-// .../qcm-api/private/qcm en mode post
-apiRouter.route(['/qcm-api/private/qcm','/qcm-api/v1/private/qcm'])
+// .../qcm-api/v1/private/qcm en mode post
+/**
+ * @openapi
+ * /qcm-api/v1/private/qcm:
+ *   post:
+ *     description: post a new qcm
+ *     responses:
+ *       201:
+ *         description: saved qcm with id
+ */
+apiRouter.route('/qcm-api/v1/private/qcm')
 .post(async function(req , res  , next ) {
 	var qcm = req.body;
     console.log("posting  qcm :" +JSON.stringify(qcm));
@@ -128,8 +146,8 @@ apiRouter.route(['/qcm-api/private/qcm','/qcm-api/v1/private/qcm'])
     }
 });
 
-// .../qcm-api/private/qcm en mode put
-apiRouter.route(['/qcm-api/private/qcm/:id','/qcm-api/v1/private/qcm/:id'])
+// .../qcm-api/v1/private/qcm en mode put
+apiRouter.route('/qcm-api/v1/private/qcm/:id')
 .put(async function(req , res  , next ) {
 	var idRes = req.params.id;
 	var qcm = req.body;
@@ -152,8 +170,8 @@ apiRouter.route(['/qcm-api/private/qcm/:id','/qcm-api/v1/private/qcm/:id'])
 
 
 
-//exemple URL: .../qcm-api/private/qcm/6213be90e247ac2221112840 en mode DELETE
-apiRouter.route(['/qcm-api/private/qcm/:id' ,'/qcm-api/v1/private/qcm/:id' ])
+//exemple URL: .../qcm-api/v1/private/qcm/6213be90e247ac2221112840 en mode DELETE
+apiRouter.route('/qcm-api/v1/private/qcm/:id' )
 .delete( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	console.log("DELETE,idRes="+idRes);

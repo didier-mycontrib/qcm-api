@@ -1,5 +1,8 @@
 import express from 'express';
 export const app = express();
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdocPkg from 'swagger-jsdoc';
+const  swaggerJSDoc  = swaggerJsdocPkg;
 
 import fileUpload  from 'express-fileupload';
 
@@ -50,6 +53,20 @@ if(withoutAuth!="yes"){
   app.use(verifAuth.verifTokenInHeadersForPrivatePath); // with OAuth2 autorization server 
   app.use(verifAuth.checkScopeForPrivatePath); //with OAuth2 autorization server 
 }
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'qcm-api',
+      version: '1.0.0',
+    },
+  },
+  apis: ['*-routes.js'], // files containing annotations with @openapi
+};
+const swaggerSpec = swaggerJSDoc(options);
+
+app.use('/qcm-api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(qcmApiRoutes.apiRouter);// delegate REST API routes to apiRouter(s)
 app.use(qcmResultsApiRoutes.apiRouter);
