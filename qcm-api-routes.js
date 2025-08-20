@@ -3,20 +3,8 @@ const apiRouter = express.Router();
 
 import qcmDao from './qcm-dao-mongoose.js';
 //qcmDao.ThisPersistentModelFn(); //to use only for specific extra request (not in dao)
+import { statusCodeFromEx , nullOrEmptyObject } from "./generic-express-util.js";
 
-
-function statusCodeFromEx(ex){
-	let status = 500;
-	if(ex== null || ex.error == null ) return status;
-	switch(ex.error){
-		case "BAD_REQUEST" : status = 400; break;
-		case "NOT_FOUND" : status = 404; break;
-		//...
-		case "CONFLICT" : status = 409; break;
-		default: status = 500;
-	}
-	return status;
-}
 
 /*
 Nouvelle convention d'URL :
@@ -25,7 +13,7 @@ http://localhost:8xxx/xyz-api/public/xyz en accès public (sans auth nécessaire
 */
 
 //exemple URL: .../qcm-api/private/reinit
-apiRouter.route('/qcm-api/private/reinit')
+apiRouter.route(['/qcm-api/private/reinit','/qcm-api/v1/private/reinit'])
 .get( async function(req , res  , next ) {
 	try{
 		let doneActionMessage = await qcmDao.reinit_db();
@@ -38,7 +26,7 @@ apiRouter.route('/qcm-api/private/reinit')
 
 //(private version : return qcm with solutions)
 //exemple URL: .../qcm-api/public/qcm/6215ef77a8f36f4037eeef0f
-apiRouter.route('/qcm-api/private/qcm/:id')
+apiRouter.route(['/qcm-api/private/qcm/:id','/qcm-api/v1/private/qcm/:id'])
 .get( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	try{
@@ -52,7 +40,7 @@ apiRouter.route('/qcm-api/private/qcm/:id')
 // version public : comme version privée 
 //mais retournant qcm avec questions seulement (pas les réponses)
 //exemple URL: .../qcm-api/public/qcm/6215ef77a8f36f4037eeef0f
-apiRouter.route('/qcm-api/public/qcm/:id')
+apiRouter.route(['/qcm-api/public/qcm/:id','/qcm-api/v1/public/qcm/:id'])
 .get( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	try{
@@ -67,7 +55,7 @@ apiRouter.route('/qcm-api/public/qcm/:id')
 // private version : return qcm array with all details (solutions )
 //exemple URL: .../qcm-api/private/qcm (returning all qcms)
 //             .../qcm-api/private/qcm?mode=training
-apiRouter.route('/qcm-api/private/qcm')
+apiRouter.route(['/qcm-api/private/qcm','/qcm-api/v1/private/qcm'])
 .get( async function(req , res  , next ) {
 	let  mode = req.query.mode;
 	var criteria=mode?{purpose  : mode}:{};
@@ -83,7 +71,7 @@ apiRouter.route('/qcm-api/private/qcm')
 //et avec filtrages : ?mode=training or ?mode=eval
 // ?org=orgXyz ?session_code=codeXyz )
 //exemple URL: .../qcm-api/public/qcm (returning all qcms)
-apiRouter.route('/qcm-api/public/qcm')
+apiRouter.route(['/qcm-api/public/qcm','/qcm-api/v1/public/qcm'])
 .get( async function(req , res  , next ) {
 	let  mode = req.query.mode; //may be null/undefined
     //let  org = req.query.org; //may be null/undefined
@@ -125,30 +113,37 @@ function ajustSolutionsInQcm(qcm){
 
 
 // .../qcm-api/private/qcm en mode post
-apiRouter.route('/qcm-api/private/qcm')
+apiRouter.route(['/qcm-api/private/qcm','/qcm-api/v1/private/qcm'])
 .post(async function(req , res  , next ) {
 	var qcm = req.body;
     console.log("posting  qcm :" +JSON.stringify(qcm));
+	if(nullOrEmptyObject(qcm)) { res.status(400).send(); return; } //BAD REQUEST
 	try{
 		ajustSolutionsInQcm(qcm);
 		let savedqcm = await qcmDao.save(qcm);
-		res.send(savedqcm);
+		let id = savedqcm.id ; 
+		res.location('/qcm/' + id).status(201).send(savedqcm);//201: successfully created
     } catch(ex){
 	    res.status(statusCodeFromEx(ex)).send(ex);
     }
 });
 
 // .../qcm-api/private/qcm en mode put
-apiRouter.route('/qcm-api/private/qcm/:id')
+apiRouter.route(['/qcm-api/private/qcm/:id','/qcm-api/v1/private/qcm/:id'])
 .put(async function(req , res  , next ) {
 	var idRes = req.params.id;
 	var qcm = req.body;
+	if(nullOrEmptyObject(qcm)) { res.status(400).send(); return; } //BAD REQUEST
 	qcm.id = idRes;
     console.log("update  qcm of id=" +idRes + ":" +JSON.stringify(qcm));
+	let verbose = req.query.v=="true"; //verbose mode ?v=true (default as false)
 	try{
 		ajustSolutionsInQcm(qcm);
 		let updatedqcm = await qcmDao.updateOne(qcm);
-		res.send(updatedqcm);
+		if(verbose)
+		  res.send(updatedqcm); //200:OK with updated entity as Json response body
+		else
+		  res.status(204).send();//NO_CONTENT
     } catch(ex){
 		console.log("ex:"+ex);
 	    res.status(statusCodeFromEx(ex)).send(ex);
@@ -162,9 +157,13 @@ apiRouter.route(['/qcm-api/private/qcm/:id' ,'/qcm-api/v1/private/qcm/:id' ])
 .delete( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	console.log("DELETE,idRes="+idRes);
+	let verbose = req.query.v=="true"; //verbose mode (default as false)
 	try{
 		let deleteActionMessage = await qcmDao.deleteOne(idRes);
-		res.send(deleteActionMessage);
+		if(verbose)
+		    res.send(deleteActionMessage);
+		else
+			res.status(204).send();//NO_CONTENT
     } catch(ex){
 	    res.status(statusCodeFromEx(ex)).send(ex);
     }

@@ -5,19 +5,7 @@ import qcmResultsDao from './qcm-results-dao-mongoose.js';//mainDao
 import qcmDao from './qcm-dao-mongoose.js';//secondary dao
 //qcmResultsDao.ThisPersistentModelFn(); //to use only for specific extra request (not in dao)
 
-
-function statusCodeFromEx(ex){
-	let status = 500;
-	if(ex== null || ex.error == null ) return status;
-	switch(ex.error){
-		case "BAD_REQUEST" : status = 400; break;
-		case "NOT_FOUND" : status = 404; break;
-		//...
-		case "CONFLICT" : status = 409; break;
-		default: status = 500;
-	}
-	return status;
-}
+import { statusCodeFromEx , nullOrEmptyObject } from "./generic-express-util.js";
 
 /*
 Nouvelle convention d'URL :
@@ -26,7 +14,7 @@ http://localhost:8xxx/xyz-api/public/xyz en accès public (sans auth nécessaire
 */
 
 //exemple URL: .../qcm-api/private/reinit-results
-apiRouter.route('/qcm-api/private/reinit-results')
+apiRouter.route(['/qcm-api/private/reinit-results','/qcm-api/v1/private/reinit-results'])
 .get( async function(req , res  , next ) {
 	try{
 		let doneActionMessage = await qcmResultsDao.reinit_db();
@@ -38,7 +26,7 @@ apiRouter.route('/qcm-api/private/reinit-results')
 
 
 //exemple URL: .../qcm-api/private/qcm_results/621607cd5adc0f2365d8955c
-apiRouter.route('/qcm-api/private/qcm_results/:id')
+apiRouter.route(['/qcm-api/private/qcm_results/:id','/qcm-api/v1/private/qcm_results/:id'])
 .get( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	try{
@@ -53,7 +41,7 @@ apiRouter.route('/qcm-api/private/qcm_results/:id')
 
 //exemple URL: .../qcm-api/private/qcm_results (returning all qcmRes)
 //             .../qcm-api/private/qcm_results?xyz=xyz
-apiRouter.route('/qcm-api/private/qcm_results')
+apiRouter.route(['/qcm-api/private/qcm_results','/qcm-api/v1/private/qcm_results'])
 .get( async function(req , res  , next ) {
 	let  xyz = req.query.xyz;
 	var criteria=xyz?{xyz  : xyz}:{};
@@ -68,7 +56,7 @@ apiRouter.route('/qcm-api/private/qcm_results')
 //POST and PUT : NA (not applicable) on qcm_results
 
 //exemple URL: .../qcm-api/private/qcm_results/621607cd5adc0f2365d8955c en mode DELETE
-apiRouter.route('/qcm-api/private/qcm_results/:id')
+apiRouter.route(['/qcm-api/private/qcm_results/:id','/qcm-api/v1/private/qcm_results/:id'])
 .delete( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	console.log("DELETE,idRes="+idRes);
@@ -120,10 +108,11 @@ function buildResults(qcm, choices){
 }
 
 //POST qcm_choices to get results
-apiRouter.route('/qcm-api/public/qcm_choices')
+apiRouter.route(['/qcm-api/public/qcm_choices','/qcm-api/v1/public/qcm_choices'])
 .post(async function(req , res  , next ) {
 	var postChoicesRequest = req.body;
     console.log("postChoicesRequest :" +JSON.stringify(postChoicesRequest));
+    if(nullOrEmptyObject(postChoicesRequest)) { res.status(400).send(); return; } //BAD REQUEST
   try{
 	let qcmGlobalResult = null;
     let email = postChoicesRequest.qcmPerformer.email;

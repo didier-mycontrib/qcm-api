@@ -5,6 +5,8 @@ utilise une base mongoDB "qcm_db".
 ==========
 npm install -s express
 npm install -s mongoose
+npm install -s axios
+npm install -s passport passport-keycloak-bearer 
 
 ======
 en mode dev,
