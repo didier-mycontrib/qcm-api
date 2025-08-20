@@ -4,21 +4,25 @@ import axios from 'axios';
 import passport from 'passport';
 import KeycloakBearerStrategy from 'passport-keycloak-bearer';
 
+//NB: le fichier www-d-defrance-fr-chain.pem à la racine du projet est nécessaire 
+//pour une bonne communication avec keycloak 
+//et ce fichier doit être réactualisé tous les ans (après réactualisation du certificat ssl)
+
 // GLOBAL COMMON PART
 //*************************************************** 
 
 async function tryInitRemoteOAuth2OidcKeycloakMode(){
     try{
-        let realmUrl ;
+        let realmName ;
         let withSandboxRealm = process.env.WITH_SANDBOXREALM;
         if(withSandboxRealm=="yes"){
-          realmUrl="https://www.d-defrance.fr/keycloak/realms/sandboxrealm"
+          realmName="sandboxrealm"
         }else{
-          realmUrl="https://www.d-defrance.fr/keycloak/realms/d2frealm"
+          realmName="d2frealm"
         }
-        await tryingOidcServerConnection(`${realmUrl}/.well-known/openid-configuration`);
-        initPassportKeycloakBearerStrategy();
-        console.log("initPassportKeycloakBearerStrategy ok with realmUrl="+realmUrl)
+        await tryingOidcServerConnection(`https://www.d-defrance.fr/keycloak/realms/${realmName}/.well-known/openid-configuration`);
+        initPassportKeycloakBearerStrategy(realmName);
+        console.log("initPassportKeycloakBearerStrategy ok with realmName="+realmName)
     }catch(ex){
         console.log("ERROR: initPassportKeycloakBearerStrategy not ok !!!!")
     }
@@ -62,12 +66,12 @@ function extractOidcUserInfosFromJwtPayload(jwtPayload){
   }
 
 
-function initPassportKeycloakBearerStrategy(){
-
+function initPassportKeycloakBearerStrategy(realmName){
+	
 // new KeycloakBearerStrategy(options, verify)
 passport.use(new KeycloakBearerStrategy({
-    "realm": "sandboxrealm",
-    "url": "https://www.d-defrance.fr/keycloak"
+    realm: realmName,
+    url: "https://www.d-defrance.fr/keycloak"
   }, (jwtPayload, done) => {
     //console.log("jwtPayload="+ JSON.stringify(jwtPayload));
     const user = extractOidcUserInfosFromJwtPayload(jwtPayload);
