@@ -16,6 +16,9 @@ pipeline {
 
         //for "Integration Test" avec @testcontainers/mongodb
 		TEST_MODE="IT"
+
+		//desactivate auth for simple api test
+		WITHOUT_AUTH="yes"
 	}
 
     stages {

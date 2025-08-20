@@ -6,6 +6,8 @@ import { MongoDBContainer } from '@testcontainers/mongodb'
 //NB: this test file will be globally used to test qcm-api AND qcm-results-api
 //because qcm-results depends of some existing qcm
 
+//NB: in script (.sh, .bat , ...) : set/export WITHOUT_AUTH=yes // undefined by default
+//WITHOUT THAT , security (auth check) will block private requests (post, ..)
 
 const chai=use(chaiHttp); //configure chai to use chaiHttp
 //NB: run mocha with --exit option for good server exit after test execution
@@ -47,6 +49,7 @@ describe("rest qcm-api tests", ()=>{
 
   
 	before(async () =>{
+
      mongodbContainer=await initMongodbContainer(); //utile seulement en mode IT (avec jenkins ou ...)
   
      console.log("initialisations before all tests of qcm-api.spec (dataset or ...)");

@@ -8,7 +8,8 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 import qcmApiRoutes from './qcm-api-routes.js';
 import qcmResultsApiRoutes from './qcm-results-api-routes.js';
-//import verifAuth from './verif-auth.js';
+
+import verifAuth from './verif-auth-oauth2.js'; //for  oauth2/iodc/keycloak 
 
 //support parsing of JSON post data
 var jsonParser = express.json({  extended: true}); 
@@ -41,8 +42,14 @@ app.get('/', function(req , res ) {
   res.redirect('/html/index.html');
 });
 
-//verif auth in request header for private api/path:
-//app.use(verifAuth.verifAuthInHeadersForPrivatePath);
+let withoutAuth = process.env.WITHOUT_AUTH ;
+
+if(withoutAuth!="yes"){
+  //verif auth beared token in request for private api/path:
+  verifAuth.tryInitRemoteOAuth2OidcKeycloakMode(); 
+  app.use(verifAuth.verifTokenInHeadersForPrivatePath); // with OAuth2 autorization server 
+  app.use(verifAuth.checkScopeForPrivatePath); //with OAuth2 autorization server 
+}
 
 app.use(qcmApiRoutes.apiRouter);// delegate REST API routes to apiRouter(s)
 app.use(qcmResultsApiRoutes.apiRouter);

@@ -8,6 +8,7 @@ REM set MONGODB_PASSWORD_FILE=my_temp_secret_pwd.txt
 REM node server.js
 
 REM WITHOUT_AUTH!=yes by default
+set WITHOUT_AUTH=yes
 REM WITH_SANDBOXREALM!=yes by default
 
 nodemon server.js

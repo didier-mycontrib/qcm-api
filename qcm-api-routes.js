@@ -158,7 +158,7 @@ apiRouter.route('/qcm-api/private/qcm/:id')
 
 
 //exemple URL: .../qcm-api/private/qcm/6213be90e247ac2221112840 en mode DELETE
-apiRouter.route('/qcm-api/private/qcm/:id')
+apiRouter.route(['/qcm-api/private/qcm/:id' ,'/qcm-api/v1/private/qcm/:id' ])
 .delete( async function(req , res  , next ) {
 	var idRes = req.params.id;
 	console.log("DELETE,idRes="+idRes);
