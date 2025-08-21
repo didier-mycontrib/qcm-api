@@ -5,7 +5,16 @@ import qcmResultsDao from './qcm-results-dao-mongoose.js';//mainDao
 import qcmDao from './qcm-dao-mongoose.js';//secondary dao
 //qcmResultsDao.ThisPersistentModelFn(); //to use only for specific extra request (not in dao)
 
-import { statusCodeFromEx , nullOrEmptyObject } from "./generic-express-util.js";
+import { statusCodeFromEx , nullOrEmptyObject , build_api_uris , 
+	    addDefaultPrivateReInitRoute ,
+	    addDefaultGetByIdRoute ,addDefaultGetByCriteriaRoute ,
+	    addDefaultDeleteRoute , addDefaultPostRoute , addDefaultPutRoute} from "./generic-express-util.js";
+
+const api_name="qcm-api"
+const api_version="v1"
+const main_entities_name="qcm_results" // main collection (entities name)  
+
+const api_uris = build_api_uris(api_name,api_version,main_entities_name);
 
 /*
 Nouvelle convention d'URL :
@@ -26,47 +35,86 @@ apiRouter.route(['/qcm-api/private/reinit-results','/qcm-api/v1/private/reinit-r
 
 
 //exemple URL: .../qcm-api/private/qcm_results/621607cd5adc0f2365d8955c
-apiRouter.route(['/qcm-api/private/qcm_results/:id','/qcm-api/v1/private/qcm_results/:id'])
-.get( async function(req , res  , next ) {
-	var idRes = req.params.id;
-	try{
-		let qcmRes = await qcmResultsDao.findById( idRes);
-		res.send(qcmRes);
-    } catch(ex){
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    } 
-});
+///qcm-api/v1/private/qcm_results/:id
+/**
+ * @openapi
+ * /qcm-api/v1/private/qcm_results/{id}:
+ *   get:
+ *     description: qcm_results by id
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6215ef77a8f36f4037eeef0d
+ *     responses:
+ *       200:
+ *         description: Returns qcm_results
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/QcmResults"
+ *       404:
+ *         description: NOT_FOUND
+ */
+addDefaultGetByIdRoute(apiRouter,qcmResultsDao,api_uris,"private")
 
 
 
 //exemple URL: .../qcm-api/v1/private/qcm_results (returning all qcmRes)
 //             .../qcm-api/v1/private/qcm_results?xyz=xyz
-apiRouter.route('/qcm-api/v1/private/qcm_results')
-.get( async function(req , res  , next ) {
-	let  xyz = req.query.xyz;
-	var criteria=xyz?{xyz  : xyz}:{};
-	try{
-		let qcmResArray = await qcmResultsDao.findByCriteria(criteria);
-		res.send(qcmResArray);
-    } catch(ex){
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    } 
-});
+//'/qcm-api/v1/private/qcm_results'
+/**
+ * @openapi
+ * /qcm-api/v1/private/qcm_results:
+ *   get:
+ *     description: qcm_results list qcm_results (from criteria)
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/QcmResultsArray"
+ *         description: Returns qcm_results list 
+ */
+addDefaultGetByCriteriaRoute(apiRouter,qcmResultsDao,api_uris,"private"
+   /* ,(req)=>{const mode = req.query.xyz; const  criteria={}; return criteria } */
+)
+
 
 //POST and PUT : NA (not applicable) on qcm_results
 
 //exemple URL: .../qcm-api/private/qcm_results/621607cd5adc0f2365d8955c en mode DELETE
-apiRouter.route('/qcm-api/v1/private/qcm_results/:id')
-.delete( async function(req , res  , next ) {
-	var idRes = req.params.id;
-	console.log("DELETE,idRes="+idRes);
-	try{
-		let deleteActionMessage = await qcmResultsDao.deleteOne(idRes);
-		res.send(deleteActionMessage);
-    } catch(ex){
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    }
-});
+//'/qcm-api/v1/private/qcm_results/:id')
+/**
+ * @openapi
+ * /qcm-api/v1/private/qcm_results/{id}:
+ *   delete:
+ *     description: delete qcm_results  by id
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6215ef77a8f36f4037eeef0d
+ *       - name: v
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: "verbose: to ask 200/message (not 204/NO_CONTENT)"
+ *     responses:
+ *       200:
+ *         description : delete action json message with deletedId
+ *       204:
+ *         description: NO_CONTENT (OK)
+ *       404:
+ *         description: NOT_FOUND
+ */
+addDefaultDeleteRoute(apiRouter,qcmResultsDao,api_uris)
+
 
 //-----------------------------
 
@@ -107,7 +155,59 @@ function buildResults(qcm, choices){
     return qcmResults;
 }
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     PostChoicesRequest:
+ *       type: object
+ *       properties:
+ *         qcmPerformer: 
+ *           $ref: "#/components/schemas/QcmPerformer"
+ *         qcmId:
+ *           type: string
+ *         choices:
+ *           type: array
+ *           items:
+ *             $ref: "#/components/schemas/ResponseChoice"
+ *
+ *     PostChoicesResponse:
+ *       type: object
+ *       properties:
+ *         globalResults: 
+ *           $ref: "#/components/schemas/QcmGlobalResults"
+ *         qcmResultsId:
+ *           type: string
+ *         choices:
+ *           type: array
+ *           items:
+ *             $ref: "#/components/schemas/ResponseChoice"
+ *         qcm:
+ *           $ref: "#/components/schemas/Qcm"
+ * 
+ */
+
 //POST qcm_choices to get results
+/**
+ * @openapi
+ * /qcm-api/v1/public/qcm_choices:
+ *   post:
+ *     description: post postChoicesRrequest (DTO) for a qcm
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/PostChoicesRequest"
+ *     responses:
+ *       201:
+ *         description: specific postChoicesResponse (DTO)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/PostChoicesResponse"
+ *       500:
+ *         description: INTERNAL_SERVER_ERROR
+ */
 apiRouter.route('/qcm-api/v1/public/qcm_choices')
 .post(async function(req , res  , next ) {
 	var postChoicesRequest = req.body;

@@ -289,7 +289,7 @@ addDefaultPutRoute(apiRouter,qcmDao,api_uris,
  *         required: false
  *         schema:
  *           type: boolean
- *         description: "verbose: to ask 200/updatedQcm (not 204/NO_CONTENT)"
+ *         description: "verbose: to ask 200/message (not 204/NO_CONTENT)"
  *     responses:
  *       200:
  *         description : delete action json message with deletedId

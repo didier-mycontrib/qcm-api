@@ -173,7 +173,7 @@ setSubSchemaWithoutIdNorVersionKey(questionSchema);
       //console.log("mongoose thisSchema : " + JSON.stringify(thisSchema) );
       //"Qcm" model name is "qcms" collection name in mongoDB  database
       ThisPersistentModel = mongoose.model('Qcm', thisSchema);
-}
+
 
 /**
  * @openapi
@@ -226,6 +226,8 @@ setSubSchemaWithoutIdNorVersionKey(questionSchema);
  *       items: 
  *         $ref: "#/components/schemas/Qcm"
  */
+
+}
 
 function ThisPersistentModelFn(){
   if(ThisPersistentModel==null)
