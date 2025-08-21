@@ -9,6 +9,8 @@ npm install -s axios
 npm install -s passport passport-keycloak-bearer 
 npm install -s swagger-ui-express
 npm install -s swagger-jsdoc
+====
+npm install --save-dev mocha chai chai-http @testcontainers/mongodb
 
 ======
 en mode dev,

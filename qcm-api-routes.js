@@ -3,7 +3,16 @@ const apiRouter = express.Router();
 
 import qcmDao from './qcm-dao-mongoose.js';
 //qcmDao.ThisPersistentModelFn(); //to use only for specific extra request (not in dao)
-import { statusCodeFromEx , nullOrEmptyObject } from "./generic-express-util.js";
+import { statusCodeFromEx , nullOrEmptyObject , build_api_uris , 
+	    addDefaultPrivateReInitRoute ,
+	    addDefaultGetByIdRoute ,addDefaultGetByCriteriaRoute ,
+	    addDefaultDeleteRoute , addDefaultPostRoute , addDefaultPutRoute} from "./generic-express-util.js";
+
+const api_name="qcm-api"
+const api_version="v1"
+const main_entities_name="qcm" //or "qcms" , main collection (entities name)  
+
+const api_uris = build_api_uris(api_name,api_version,main_entities_name);
 
 
 /*
@@ -12,60 +21,117 @@ http://localhost:8xxx/xyz-api/v1/private/xyz en accès private (avec auth néces
 http://localhost:8xxx/xyz-api/v1/public/xyz en accès public (sans auth nécessaire)
 */
 
+
+/**
+ * @openapi
+ * components:
+ *   responses:
+ *     Qcm:
+ *       description: Qcm
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Qcm" 
+ *     Qcms:
+ *       description: Qcm array
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/QcmArray"   
+ */
+
 //exemple URL: .../qcm-api/v1/private/reinit
-apiRouter.route('/qcm-api/v1/private/reinit')
-.get( async function(req , res  , next ) {
-	try{
-		let doneActionMessage = await qcmDao.reinit_db();
-		res.send(doneActionMessage);
-    } catch(ex){
-		console.log("ex:"+ex)
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    } 
-});
+addDefaultPrivateReInitRoute(apiRouter,qcmDao,api_uris)
 
 //(private version : return qcm with solutions)
 //exemple URL: .../qcm-api/v1/public/qcm/6215ef77a8f36f4037eeef0f
-apiRouter.route('/qcm-api/v1/private/qcm/:id')
-.get( async function(req , res  , next ) {
-	var idRes = req.params.id;
-	try{
-		let qcm = await qcmDao.findById( idRes);
-		res.send(qcm);
-    } catch(ex){
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    } 
-});
+// '/qcm-api/v1/private/qcm/:id'
+/**
+ * @openapi
+ * /qcm-api/v1/private/qcm/{id}:
+ *   get:
+ *     description: qcm (with solutions) by id
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6215ef77a8f36f4037eeef0d
+ *     responses:
+ *       200:
+ *         description: Returns qcm (with solutions)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Qcm"
+ *       404:
+ *         description: NOT_FOUND
+ */
+addDefaultGetByIdRoute(apiRouter,qcmDao,api_uris,"private")
+
 
 // version public : comme version privée 
 //mais retournant qcm avec questions seulement (pas les réponses)
 //exemple URL: .../qcm-api/v1/public/qcm/6215ef77a8f36f4037eeef0f
-apiRouter.route('/qcm-api/v1/public/qcm/:id')
-.get( async function(req , res  , next ) {
-	var idRes = req.params.id;
-	try{
-		let qcm = await qcmDao.findById( idRes);
-		qcm.solutions=null; //pour eviter triche via observation directe des req http
-		res.send(qcm);
-    } catch(ex){
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    } 
-});
+//'/qcm-api/v1/public/qcm/:id'
+/**
+ * @openapi
+ * /qcm-api/v1/public/qcm/{id}:
+ *   get:
+ *     description: qcm (without solutions) by id
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6215ef77a8f36f4037eeef0d
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Qcm"
+ *         description: Returns qcm (without solutions , questions only)
+ *       404:
+ *         description: NOT_FOUND
+ */
+addDefaultGetByIdRoute(apiRouter,qcmDao,api_uris,"public",
+	(qcm)=>{qcm.solutions=null}//pour eviter triche via observation directe des req http
+)
+
 
 // private version : return qcm array with all details (solutions )
 //exemple URL: .../qcm-api/v1/private/qcm (returning all qcms)
 //             .../qcm-api/v1/private/qcm?mode=training
-apiRouter.route('/qcm-api/v1/private/qcm')
-.get( async function(req , res  , next ) {
-	let  mode = req.query.mode;
-	var criteria=mode?{purpose  : mode}:{};
-	try{
-		let qcms = await qcmDao.findByCriteria(criteria);
-		res.send(qcms);
-    } catch(ex){
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    } 
-});
+/**
+ * @openapi
+ * /qcm-api/v1/private/qcm:
+ *   get:
+ *     description: qcm list (with details) from criteria
+ *     parameters:
+ *       - name: mode
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum:
+ *             - training
+ *             - eval
+ *         description: "filtering qcm purpose (training or eval)"
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/QcmArray"
+ *         description: Returns qcm list (with details)
+ */
+addDefaultGetByCriteriaRoute(apiRouter,qcmDao,api_uris,"private",
+	(req)=>{const mode = req.query.mode; const  criteria=mode?{purpose  : mode}:{}; return criteria }
+)
+
 
 //version public comme version privée mais retournant [] de Qcm sans details
 //et avec filtrages : ?mode=training or ?mode=eval
@@ -75,26 +141,29 @@ apiRouter.route('/qcm-api/v1/private/qcm')
  * @openapi
  * /qcm-api/v1/public/qcm:
  *   get:
- *     description: qcm list from criteria
+ *     description: qcm list (without details) from criteria
+ *     parameters:
+ *       - name: mode
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum:
+ *             - training
+ *             - eval
+ *         description: "filtering qcm purpose (training or eval)"
  *     responses:
  *       200:
- *         description: Returns qcm list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/QcmArray"
+ *         description: Returns qcm list (without details)
  */
-apiRouter.route('/qcm-api/v1/public/qcm')
-.get( async function(req , res  , next ) {
-	let  mode = req.query.mode; //may be null/undefined
-    //let  org = req.query.org; //may be null/undefined
-    //let  session_code = req.query.session_code; //may be null/undefined
-	var criteria=mode?{purpose  : mode}:{};
-	try{
-		let qcms = await qcmDao.findByCriteria(criteria);
-		qcms.forEach((qcm)=>{qcm.questions=null; qcm.solutions=null;});
-		res.send(qcms);
-    } catch(ex){
-		console.log("ex="+ex)
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    } 
-});
+addDefaultGetByCriteriaRoute(apiRouter,qcmDao,api_uris,"public",
+	(req)=>{const mode = req.query.mode; const  criteria=mode?{purpose  : mode}:{}; return criteria },
+	(qcms)=>{ qcms.forEach((qcm)=>{qcm.questions=null; qcm.solutions=null;}); }
+)
 
 var tabResNumFromIndex  = [ 'a' , 'b' , 'c' , 'd' , 'e' , 'f' ,'g' , 'h'];
 
@@ -120,72 +189,116 @@ function ajustSolutionsInQcm(qcm){
     }
 }
 
+/*
+Rappels des paramétrages openapi sur propriétés:
+   type : number ou string ou ...
+   format : double ou int64 ou autre 
+   default : defaultValue
+   description : descriptionQuiVaBien
+*/
+
+
 
 // .../qcm-api/v1/private/qcm en mode post
+//'/qcm-api/v1/private/qcm'
 /**
  * @openapi
  * /qcm-api/v1/private/qcm:
  *   post:
  *     description: post a new qcm
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Qcm"
  *     responses:
  *       201:
  *         description: saved qcm with id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Qcm"
+ *       500:
+ *         description: INTERNAL_SERVER_ERROR
  */
-apiRouter.route('/qcm-api/v1/private/qcm')
-.post(async function(req , res  , next ) {
-	var qcm = req.body;
-    console.log("posting  qcm :" +JSON.stringify(qcm));
-	if(nullOrEmptyObject(qcm)) { res.status(400).send(); return; } //BAD REQUEST
-	try{
-		ajustSolutionsInQcm(qcm);
-		let savedqcm = await qcmDao.save(qcm);
-		let id = savedqcm.id ; 
-		res.location('/qcm/' + id).status(201).send(savedqcm);//201: successfully created
-    } catch(ex){
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    }
-});
+addDefaultPostRoute(apiRouter,qcmDao,api_uris,
+     (savedQcm)=>savedQcm.id , 
+	 (qcmToSave) => { ajustSolutionsInQcm(qcmToSave); }
+)
+
 
 // .../qcm-api/v1/private/qcm en mode put
-apiRouter.route('/qcm-api/v1/private/qcm/:id')
-.put(async function(req , res  , next ) {
-	var idRes = req.params.id;
-	var qcm = req.body;
-	if(nullOrEmptyObject(qcm)) { res.status(400).send(); return; } //BAD REQUEST
-	qcm.id = idRes;
-    console.log("update  qcm of id=" +idRes + ":" +JSON.stringify(qcm));
-	let verbose = req.query.v=="true"; //verbose mode ?v=true (default as false)
-	try{
-		ajustSolutionsInQcm(qcm);
-		let updatedqcm = await qcmDao.updateOne(qcm);
-		if(verbose)
-		  res.send(updatedqcm); //200:OK with updated entity as Json response body
-		else
-		  res.status(204).send();//NO_CONTENT
-    } catch(ex){
-		console.log("ex:"+ex);
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    }
-});
+//'/qcm-api/v1/private/qcm/:id'
 
+/**
+ * @openapi
+ * /qcm-api/v1/public/qcm/{id}:
+ *   put:
+ *     description: update qcm with existing id
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6215ef77a8f36f4037eeef0d
+ *       - name: v
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: "verbose: to ask 200/updatedQcm (not 204/NO_CONTENT)"
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Qcm"
+ *     responses:
+ *       200:
+ *         description: updated qcm
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/Qcm"
+ *       204:
+ *         description: NO_CONTENT (OK)
+ *       404:
+ *         description: NOT_FOUND
+ */
+addDefaultPutRoute(apiRouter,qcmDao,api_uris,
+	 (idRes,qcmToUpdate) => { qcmToUpdate.id = idRes; ajustSolutionsInQcm(qcmToUpdate); }
+)
 
 
 //exemple URL: .../qcm-api/v1/private/qcm/6213be90e247ac2221112840 en mode DELETE
-apiRouter.route('/qcm-api/v1/private/qcm/:id' )
-.delete( async function(req , res  , next ) {
-	var idRes = req.params.id;
-	console.log("DELETE,idRes="+idRes);
-	let verbose = req.query.v=="true"; //verbose mode (default as false)
-	try{
-		let deleteActionMessage = await qcmDao.deleteOne(idRes);
-		if(verbose)
-		    res.send(deleteActionMessage);
-		else
-			res.status(204).send();//NO_CONTENT
-    } catch(ex){
-	    res.status(statusCodeFromEx(ex)).send(ex);
-    }
-});
+// '/qcm-api/v1/private/qcm/:id' 
+/**
+ * @openapi
+ * /qcm-api/v1/private/qcm/{id}:
+ *   delete:
+ *     description: delete qcm  by id
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6215ef77a8f36f4037eeef0d
+ *       - name: v
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *         description: "verbose: to ask 200/updatedQcm (not 204/NO_CONTENT)"
+ *     responses:
+ *       200:
+ *         description : delete action json message with deletedId
+ *       204:
+ *         description: NO_CONTENT (OK)
+ *       404:
+ *         description: NOT_FOUND
+ */
+addDefaultDeleteRoute(apiRouter,qcmDao,api_uris)
 
 
 export  default { apiRouter };

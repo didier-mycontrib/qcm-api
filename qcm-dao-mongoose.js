@@ -32,12 +32,44 @@ let answerSchema = new  mongoose.Schema({
     ok : Boolean
   });
 setSubSchemaWithoutIdNorVersionKey(answerSchema);
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Answer:
+ *       type: object
+ *       properties:
+ *         txtNum:
+ *           type: string
+ *           enum: 
+ *             - a
+ *             - b
+ *             - c
+ *             - d
+ *             - e
+ *             - f 
+ *             - g
+ *             - h
+ *         text:
+ *           type: string
+ *         ok:
+ *           type: boolean
+ * 
+ *     AnswerArray:
+ *       type: array
+ *       items:
+ *         $ref: "#/components/schemas/Answer"
+ *
+ */
+
+
 /*
 Question:
 =========
 num: // 1 or .. 
 question: // texte de la question 
-image  null ou chemin image  
+image:  null ou chemin image  
 nbGoodAnswers : // 1 (exclusif) ou plus 
 answers : tableau des réponses (à choisir)
 */
@@ -49,6 +81,34 @@ let  questionSchema = new  mongoose.Schema({
   });
 setSubSchemaWithoutIdNorVersionKey(questionSchema);
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Question:
+ *       type: object
+ *       properties:
+ *         num:
+ *           type: number
+ *           format: int64
+ *         question:
+ *           type: string
+ *         nbGoodAnswers:
+ *           type: number
+ *           format: int64
+ *           default: 1
+ *         answers:
+ *           type: array
+ *           items:
+ *             $ref: "#/components/schemas/Answer"
+ * 
+ *     QuestionArray:
+ *       type: array
+ *       items:
+ *         $ref: "#/components/schemas/Question"
+ *
+ */
+
 /* Solution :
     ==========
       num : // numero d'une question ( 1 ou plus) 
@@ -59,6 +119,28 @@ setSubSchemaWithoutIdNorVersionKey(questionSchema);
         goodAnswerNums : [ String ],
       });
   setSubSchemaWithoutIdNorVersionKey(solutionSchema);
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Solution:
+ *       type: object
+ *       properties:
+ *         num:
+ *           type: number
+ *           format: int64
+ *         goodAnswerNums:
+ *           type: array
+ *           items:
+ *             type: string
+ * 
+ *     SolutionArray:
+ *       type: array
+ *       items:
+ *         $ref: "#/components/schemas/Solution"
+ *
+ */
 
   /*
     Qcm:
@@ -92,6 +174,58 @@ setSubSchemaWithoutIdNorVersionKey(questionSchema);
       //"Qcm" model name is "qcms" collection name in mongoDB  database
       ThisPersistentModel = mongoose.model('Qcm', thisSchema);
 }
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Qcm:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           default: null
+ *         title:
+ *           type: string
+ *         keywords:
+ *           type: array
+ *           items:
+ *             type: string
+ *         visibility:
+ *           type: string
+ *           enum: 
+ *             - public
+ *             - private
+ *           default: public
+ *         purpose:
+ *           type: string
+ *           enum: 
+ *             - training
+ *             - eval
+ *           default: training
+ *         ownerId:
+ *           type: string
+ *           default: null
+ *         authorId:
+ *           type: string
+ *           default: null
+ *         nbQuestions:
+ *           type: number
+ *           format: int64
+ *         questions:
+ *           type: array
+ *           items:
+ *             $ref: "#/components/schemas/Question"
+ *         solutions:
+ *           type: array
+ *           items:
+ *             $ref: "#/components/schemas/Solution"
+ *
+ *     QcmArray:
+ *       type: array
+ *       items: 
+ *         $ref: "#/components/schemas/Qcm"
+ */
 
 function ThisPersistentModelFn(){
   if(ThisPersistentModel==null)
