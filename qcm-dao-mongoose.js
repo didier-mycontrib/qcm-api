@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import qcmDbMongoose from './qcm-db-mongoose.js';
 import genericPromiseMongoose from './generic-promise-mongoose.js';
+import { readJsonTextFile } from './generic-file-util.js'
 
 
 //NB: This is for current entity type ("Devise" or "Customer" or "Product" or ...)
@@ -241,50 +242,10 @@ async function reinit_db(){
       const deleteAllFilter = { }
       await ThisPersistentModelFn().deleteMany( deleteAllFilter);
       //console.log("old qcms deleted");
-      await (new ThisPersistentModelFn()({ _id : "6215ef77a8f36f4037eeef0d" ,
-                title : "qcm1" , keywords : [ "js" ] , visibility : "public" , purpose : "training",
-                ownerId: null , authorId : null ,nbQuestions : 2 , 
-                questions : [{ num : 1 , question : "let or var or ... for local?",
-                              nbGoodAnswers : 1 , answers : [
-                                {txtNum:"a",text :"let"},
-                                {txtNum:"b",text :"var"},
-                                {txtNum:"c",text :"const"},
-                                {txtNum:"d",text :"local"},
-                              ]},
-                              { num : 2 , question : "await in wich type of function?",
-                              nbGoodAnswers : 1 , answers : [
-                                {txtNum:"a",text :"void"},
-                                {txtNum:"b",text :"global"},
-                                {txtNum:"c",text :"async"},
-                                {txtNum:"d",text :"then"},
-                              ]}] ,
-                solutions : [ {num:1 ,goodAnswerNums : ['a'] } ,
-                              {num:2 ,goodAnswerNums : ['c'] }
-                            ]}
-         )).save();
-         //console.log("qcm1 saved")
-         await (new ThisPersistentModelFn()({ _id : "6215ef77a8f36f4037eeef0f" ,
-          title : "qcm2" , keywords : [ "java" ] , visibility : "public" , purpose : "eval",
-          ownerId: null , authorId : null ,nbQuestions : 2 , 
-          questions : [{ num : 1 , question : "keyword for inheritance ?",
-                        nbGoodAnswers : 1 , answers : [
-                          {txtNum:"a",text :"is"},
-                          {txtNum:"b",text :"kindOf"},
-                          {txtNum:"c",text :"extends"},
-                          {txtNum:"d",text :"inherit"},
-                        ]},
-                        { num : 2 , question : "keyword beetween class and interface?",
-                        nbGoodAnswers : 1 , answers : [
-                          {txtNum:"a",text :"inherit"},
-                          {txtNum:"b",text :"kindOf"},
-                          {txtNum:"c",text :"class"},
-                          {txtNum:"d",text :"implements"},
-                        ]}] ,
-          solutions : [ {num:1 ,goodAnswerNums : ['c'] } ,
-                        {num:2 ,goodAnswerNums : ['d'] }
-                      ]}
-   )).save();
-    //console.log("qcm2 saved")
+     let entitiesFromFileDataSet = await readJsonTextFile("dataset/default_qcms.json");
+      for(let e of entitiesFromFileDataSet){
+        await  (new ThisPersistentModelFn()(e)).save();
+      }
     return {action:"qcms collection in database re-initialized"}; //as Promise
   } catch(ex){
      console.log(JSON.stringify(ex));

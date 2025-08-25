@@ -10,7 +10,7 @@ import { statusCodeFromEx , nullOrEmptyObject , build_api_uris ,
 
 const api_name="qcm-api"
 const api_version="v1"
-const main_entities_name="qcm" //or "qcms" , main collection (entities name)  
+const main_entities_name="qcms" // main collection (entities name)  
 
 const api_uris = build_api_uris(api_name,api_version,main_entities_name);
 
@@ -48,7 +48,7 @@ addDefaultPrivateReInitRoute(apiRouter,qcmDao,api_uris)
 // '/qcm-api/v1/private/qcm/:id'
 /**
  * @openapi
- * /qcm-api/v1/private/qcm/{id}:
+ * /qcm-api/v1/private/qcms/{id}:
  *   get:
  *     description: qcm (with solutions) by id
  *     parameters:
@@ -73,11 +73,11 @@ addDefaultGetByIdRoute(apiRouter,qcmDao,api_uris,"private")
 
 // version public : comme version privée 
 //mais retournant qcm avec questions seulement (pas les réponses)
-//exemple URL: .../qcm-api/v1/public/qcm/6215ef77a8f36f4037eeef0f
-//'/qcm-api/v1/public/qcm/:id'
+//exemple URL: .../qcm-api/v1/public/qcms/6215ef77a8f36f4037eeef0f
+//'/qcm-api/v1/public/qcms/:id'
 /**
  * @openapi
- * /qcm-api/v1/public/qcm/{id}:
+ * /qcm-api/v1/public/qcms/{id}:
  *   get:
  *     description: qcm (without solutions) by id
  *     parameters:
@@ -103,11 +103,11 @@ addDefaultGetByIdRoute(apiRouter,qcmDao,api_uris,"public",
 
 
 // private version : return qcm array with all details (solutions )
-//exemple URL: .../qcm-api/v1/private/qcm (returning all qcms)
-//             .../qcm-api/v1/private/qcm?mode=training
+//exemple URL: .../qcm-api/v1/private/qcms (returning all qcms)
+//             .../qcm-api/v1/private/qcms?mode=training
 /**
  * @openapi
- * /qcm-api/v1/private/qcm:
+ * /qcm-api/v1/private/qcms:
  *   get:
  *     description: qcm list (with details) from criteria
  *     parameters:
@@ -136,10 +136,10 @@ addDefaultGetByCriteriaRoute(apiRouter,qcmDao,api_uris,"private",
 //version public comme version privée mais retournant [] de Qcm sans details
 //et avec filtrages : ?mode=training or ?mode=eval
 // ?org=orgXyz ?session_code=codeXyz )
-//exemple URL: .../qcm-api/public/qcm (returning all qcms)
+//exemple URL: .../qcm-api/public/qcms (returning all qcms)
 /**
  * @openapi
- * /qcm-api/v1/public/qcm:
+ * /qcm-api/v1/public/qcms:
  *   get:
  *     description: qcm list (without details) from criteria
  *     parameters:
@@ -200,10 +200,10 @@ Rappels des paramétrages openapi sur propriétés:
 
 
 // .../qcm-api/v1/private/qcm en mode post
-//'/qcm-api/v1/private/qcm'
+//'/qcm-api/v1/private/qcms'
 /**
  * @openapi
- * /qcm-api/v1/private/qcm:
+ * /qcm-api/v1/private/qcms:
  *   post:
  *     description: post a new qcm
  *     requestBody:
@@ -227,12 +227,12 @@ addDefaultPostRoute(apiRouter,qcmDao,api_uris,
 )
 
 
-// .../qcm-api/v1/private/qcm en mode put
-//'/qcm-api/v1/private/qcm/:id'
+// .../qcm-api/v1/private/qcms en mode put
+//'/qcm-api/v1/private/qcms/:id'
 
 /**
  * @openapi
- * /qcm-api/v1/public/qcm/{id}:
+ * /qcm-api/v1/private/qcms/{id}:
  *   put:
  *     description: update qcm with existing id
  *     parameters:
@@ -270,11 +270,11 @@ addDefaultPutRoute(apiRouter,qcmDao,api_uris,
 )
 
 
-//exemple URL: .../qcm-api/v1/private/qcm/6213be90e247ac2221112840 en mode DELETE
-// '/qcm-api/v1/private/qcm/:id' 
+//exemple URL: .../qcm-api/v1/private/qcms/6213be90e247ac2221112840 en mode DELETE
+// '/qcm-api/v1/private/qcms/:id' 
 /**
  * @openapi
- * /qcm-api/v1/private/qcm/{id}:
+ * /qcm-api/v1/private/qcms/{id}:
  *   delete:
  *     description: delete qcm  by id
  *     parameters:

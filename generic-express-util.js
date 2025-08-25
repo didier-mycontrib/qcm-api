@@ -110,6 +110,7 @@ export function addDefaultPostRoute(apiRouter,dao,api_uris,optionalExtractIdFn,o
 			let id = optionalExtractIdFn?optionalExtractIdFn(savedEntity):savedEntity.id; 
 			res.location(`/${api_uris.entities_name}/${id}`).status(201).send(savedEntity);//201: successfully created
 		} catch(ex){
+			console.log("addDefaultPostRoute, ex:"+ex)
 			res.status(statusCodeFromEx(ex)).send(ex);
 		}
 	});

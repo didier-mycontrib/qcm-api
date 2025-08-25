@@ -54,7 +54,7 @@ if(withoutAuth!="yes"){
   app.use(verifAuth.checkScopeForPrivatePath); //with OAuth2 autorization server 
 }
 
-const options = {
+const options_qcm_api = {
   definition: {
     openapi: '3.0.0',
     info: {
@@ -64,9 +64,9 @@ const options = {
   },
   apis: ['*-routes.js','*dao-mongoose.js'], // files containing annotations with @openapi
 };
-const swaggerSpec = swaggerJSDoc(options);
+const qcmSwaggerSpec = swaggerJSDoc(options_qcm_api);
 
-app.use('/qcm-api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/qcm-api/v1/api-docs', swaggerUi.serve,(...args) =>  swaggerUi.setup(qcmSwaggerSpec)(...args));
 
 app.use(qcmApiRoutes.apiRouter);// delegate REST API routes to apiRouter(s)
 app.use(qcmResultsApiRoutes.apiRouter);

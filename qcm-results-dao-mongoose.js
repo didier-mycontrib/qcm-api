@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import qcmDbMongoose from './qcm-db-mongoose.js';
 import genericPromiseMongoose from './generic-promise-mongoose.js';
+import { readJsonTextFile } from './generic-file-util.js'
 
 //NB: This is for current entity type ("Devise" or "Customer" or "Product" or ...)
 //NB: thisSchema and ThisPersistentModel should not be exported (private only in this current module)
@@ -183,17 +184,10 @@ async function reinit_db(){
    try {
       const deleteAllFilter = { }
       await ThisPersistentModelFn().deleteMany( deleteAllFilter);
-      await (new ThisPersistentModelFn()({ _id : "621607cd5adc0f2365d8955c" , 
-                qcmId : "6215ef77a8f36f4037eeef0d" ,
-                performer : { fullName : "jean Bon" , 
-                              email : "jean.Bon@xyz.com",
-                              org : "xyz" } ,
-                choices : [ {num:1 ,selectedAnswerNums : ['a'] } ,
-                              {num:2 ,selectedAnswerNums : ['b'] }
-                            ],
-               globalResults : { percentageScore : 50 ,nbGoodResponses : 1}
-              }
-         )).save();
+      let entitiesFromFileDataSet = await readJsonTextFile("dataset/default_qcm_results.json");
+      for(let e of entitiesFromFileDataSet){
+        await  (new ThisPersistentModelFn()(e)).save();
+      }
         return {action:"qcmResults collection in database re-initialized"}
    } catch(ex){
      console.log(JSON.stringify(ex));

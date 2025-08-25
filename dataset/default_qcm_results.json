@@ -1,0 +1,12 @@
+[
+    { "id" : "621607cd5adc0f2365d8955c" , 
+                "qcmId" : "6215ef77a8f36f4037eeef0d" ,
+                "performer" : { "fullName" : "jean Bon" , 
+                              "email" : "jean.Bon@xyz.com",
+                              "org" : "xyz" } ,
+                "choices" : [ {"num":1 ,"selectedAnswerNums" : ["a"] } ,
+                              {"num":2 ,"selectedAnswerNums" : ["b"] }
+                            ],
+               "globalResults" : { "percentageScore" : 50 ,"nbGoodResponses" : 1}
+              }
+]

@@ -1,0 +1,45 @@
+[
+{ "id" : "6215ef77a8f36f4037eeef0d" ,
+                "title" : "qcm1" , "keywords" : [ "js" ] , 
+                "visibility" : "public" , "purpose" : "training",
+                "ownerId": null , "authorId" : null ,"nbQuestions" : 2 , 
+                "questions" : [{ "num" : 1 , "question" : "let or var or ... for local?",
+                              "nbGoodAnswers" : 1 , "answers" : [
+                                {"txtNum":"a","text" :"let"},
+                                {"txtNum":"b","text" :"var"},
+                                {"txtNum":"c","text" :"const"},
+                                {"txtNum":"d","text" :"local"}
+                              ]},
+                              { "num" : 2 , "question" : "await in wich type of function?",
+                              "nbGoodAnswers" : 1 , "answers" : [
+                                {"txtNum:":"a","text" :"void"},
+                                {"txtNum:":"b","text" :"global"},
+                                {"txtNum":"c","text" :"async"},
+                                {"txtNum":"d","text" :"then"}
+                              ]}] ,
+                "solutions" : [ {"num":1 ,"goodAnswerNums" : ["a"] } ,
+                              {"num":2 ,"goodAnswerNums" : ["c"] }
+                            ]
+    },
+    { "id" : "6215ef77a8f36f4037eeef0f" ,
+          "title" : "qcm2" , "keywords" : [ "java" ] ,
+          "visibility" : "public" , "purpose" : "eval",
+          "ownerId": null , "authorId" : null ,"nbQuestions" : 2 , 
+          "questions" : [{ "num" : 1 , "question" : "keyword for inheritance ?",
+                        "nbGoodAnswers" : 1 , "answers" : [
+                          {"txtNum":"a","text" :"is"},
+                          {"txtNum":"b","text" :"kindOf"},
+                          {"txtNum":"c","text" :"extends"},
+                          {"txtNum":"d","text" :"inherit"}
+                        ]},
+                        { "num" : 2 , "question" : "keyword beetween class and interface?",
+                        "nbGoodAnswers" : 1 , "answers" : [
+                          {"txtNum":"a","text" :"inherit"},
+                          {"txtNum":"b","text" :"kindOf"},
+                          {"txtNum":"c","text" :"class"},
+                          {"txtNum":"d","text" :"implements"}
+                        ]}] ,
+          "solutions" : [ {"num":1 ,"goodAnswerNums" : ["c"] } ,
+                        {"num":2 ,"goodAnswerNums" : ["d"] }
+                      ]}
+]

@@ -1,0 +1,13 @@
+{         "id" : null ,
+          "title" : "qcmA_test" , "keywords" : [ "js" ] ,
+          "visibility" : "public" , "purpose" : "training",
+          "ownerId": null , "authorId" : null ,"nbQuestions" : 1 , 
+          "questions" : [{ "num" : 1 , "question" : "js is for ...?",
+                        "nbGoodAnswers" : 1 , "answers" : [
+                          {"txtNum":"a","text" :"javascript" , "ok" : true},
+                          {"txtNum":"b","text" :"java", "ok": false },
+                          {"txtNum":"c","text" :"python","ok": false },
+                          {"txtNum":"d","text" :"c","ok": false }
+                        ]}] ,
+          "solutions" : [  ]
+        }

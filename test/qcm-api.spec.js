@@ -1,7 +1,8 @@
 import {use} from  'chai';
 import chaiHttp  from 'chai-http';
 import { app , server } from '../server.js';
-import { MongoDBContainer } from '@testcontainers/mongodb'
+import { initMongodbContainer , initMainDataSet , removeMainDataSet,
+  classicHttpCrudTest } from './generic-chai-http-mocha-test.js';
 
 //NB: this test file will be globally used to test qcm-api AND qcm-results-api
 //because qcm-results depends of some existing qcm
@@ -14,118 +15,62 @@ const chai=use(chaiHttp); //configure chai to use chaiHttp
 
 const { expect } = chai;
 
-//ADD qcmA dataSet before begin of all tests
-async function initQcmADataSet(){
-   let qcmA = {title:"qcmA",purpose:"training",keywords:["js"],visibility:"public",ownerId:null,
-    authorId:null,nbQuestions:1,
-    questions:[
-      {num:1,question:"js is for ...",image:null,nbGoodAnswers:1,
-      answers:[{txtNum:"a",text:"javascript",ok:true},
-               {txtNum:"b",text:"java",ok:false},
-               {txtNum:"c",text:"python",ok:false},
-               {txtNum:"d",text:"c",ok:false}]
-      }],
-      solutions:[]}; //end of qcmA
-
-      const requester = retreiveMyAppRequester();
-      const resPostQcmA = await requester.post('/qcm-api/v1/private/qcm')
-                     .send(qcmA);
-      qcmA.id = resPostQcmA.body.id ;
-      //console.log("qcmA added in database/dataset with id="+qcmA.id)
-      return qcmA;
-}
-
-//REMOVE qcmA dataSet after end of all tests
-async function removeQcmADataSet(qcmA){
-     const requester = retreiveMyAppRequester();
-     const resDeleteQcmA = await requester.delete('/qcm-api/v1/private/qcm/'+qcmA.id)
-     console.log("data set remove at end of all tests")
-}
-
-describe("rest qcm-api tests", ()=>{
-  let mongodbContainer=null;//for integration-test (in jenkins or ...)
-
-  let qcmA =null; //part of data-set
-
-  
-	before(async () =>{
-
-     mongodbContainer=await initMongodbContainer(); //utile seulement en mode IT (avec jenkins ou ...)
-  
-     console.log("initialisations before all tests of qcm-api.spec (dataset or ...)");
-    //insertion d'un jeu de données via http call:
-    qcmA = await initQcmADataSet();
-    console.log("qcmA.id="+qcmA.id + " was post");
-    
-  }).timeout(800000); //grande valeur de timeout car premier démarrage lent (éventuelle téléchargement de l'image docker)
-
-  after(async ()=>{
-    console.log("terminaison after all tests of qcm-api.spec ");
-    //delete dataset:
-    await removeQcmADataSet(qcmA)
-
-     if(process.env.TEST_MODE=="IT"){
-      //stop mongodbContainer (in integration test mode):
-     await mongodbContainer.stop();
-     }
-  });
-	
- it("/qcm-api/v1/public/qcm , status 200 and at least one qcm", async () =>{
-      const requester = retreiveMyAppRequester();
-      const res = await requester.get('/qcm-api/v1/public/qcm');
-      expect(res).to.have.status(200);
-      let jsBody = res.body;//as array of qcm
-      //console.log("qcm list"+JSON.stringify(jsBody));
-      expect(jsBody.length).to.be.at.least(1);
-   });
-
-   it("/qcm-api/v1/private/qcm/idOfqcmA returns status 200 and good values of qcmA", async () =>{
-    const requester = retreiveMyAppRequester();
-      console.log("get qcmA.id="+qcmA.id);
-      const res = await requester.get('/qcm-api/v1/private/qcm/'+qcmA.id);
-      expect(res).to.have.status(200);
-      let jsBody = res.body;// qcm object
-      console.log("reloaded values of qcmA=" +JSON.stringify(jsBody));
-      expect(jsBody.title).to.equal("qcmA");
-      expect(jsBody.keywords[0]).to.equal("js");
-      //...
-   });
-
-    it("post /qcm-api/v1/public/qcm_choices  return status 201 ", async () =>{
-
-      let qcmAChoice1 = {qcmId:qcmA.id,
-        mode:"training",
-        qcmPerformer:{fullName:"",email:"",org:""},
-        choices:[{num:1,selectedAnswerNums:["d"]}]
-      };
-
-       const requester = retreiveMyAppRequester();
-       const resPostQcmAChoice1 = await requester.post('/qcm-api/v1/public/qcm_choices')
-                     .send(qcmAChoice1);
-      expect(resPostQcmAChoice1).to.have.status(201);
-      //console.log("qcm_choices POST status=" + resPostQcmAChoice1.status);
-      console.log("qcm_choices POST result:="+ JSON.stringify(resPostQcmAChoice1.body))
-    });
-
-});
-
-//GENERIC FUNCTIONS (idem for other tests):
-
 function retreiveMyAppRequester(){
     return chai.request.execute(app);//"http://localhost:8230" or ...
     //NB: this code may change in other chai,chaiHttp versions
 }
 
-async function initMongodbContainer(){
-  let mongodbContainer=null;
-     if(process.env.TEST_MODE=="IT"){
-        try{
-          mongodbContainer = await new MongoDBContainer("mongo:8.0.12").start()
-          console.log("mongodbContainer connexion string: "+mongodbContainer.getConnectionString());
-          process.env.MONGODB_URL=mongodbContainer.getConnectionString()
-        }catch(ex){
-          console.log("err start mongodbContainer:"+ex)
-        }
-      }
-     return mongodbContainer;
+let testContext = {
+  chai : chai,
+  expect : expect,
+  app : app,
+  httpRequesterFn : retreiveMyAppRequester ,
+  mainDataSetFilePath : "test/dataset/qcms.json" ,
+  entityToAddFilePath : "test/dataset/new_qcm.json" ,
+  entityToUpdateFilePath : "test/dataset/update_qcm.json" ,
+  mainPrivateURL:"/qcm-api/v1/private/qcms" ,
+  mainPublicURL:"/qcm-api/v1/public/qcms" ,
+  extractIdFn : (qcm) => qcm.id ,
+  setIdFn: (qcm,id) => { qcm.id = id } ,
+  testEssentialSameValues: (e1,e2) => {
+      expect(e1.title).to.equal(e2.title);
+      expect(e1.nbQuestions).to.equal(e2.nbQuestions);
+   }
+   // .mainEntities may be dynamically added in testContext (for access from specificsubGroupTests
 }
+
+const mySpecificSubGroupTests =
+()=>{
+  /*
+  this tests block will be inserted in a sub described part of classicHttpCrudTest
+  all inner tests should be written as following :
+     * get http requester via requester = testContext.httpRequesterFn();
+       with or without .keepOpen() and .close()
+     * testContext.expect(res)....
+     * can access testContext.mainEntities initialized by classicHttpCrudTest main describe block 
+  */
+
+  it("post qcm_choices for first test qcm",async ()=>{
+       let firstEntity = testContext.mainEntities[0];
+       let idOfFirstEntity = testContext.extractIdFn(firstEntity)
+       // firstEntity will be first entry of test/dataset/qcms.json
+       //==> qcmChoice1 must have same questions/responses/choices number (ex: 2)
+      
+      let qcmChoice1 = {qcmId:idOfFirstEntity,
+        mode:"training",
+        qcmPerformer:{fullName:"",email:"",org:""},
+        choices:[{num:1,selectedAnswerNums:["d"]}, {num:2,selectedAnswerNums:["c"]}]
+      };
+      //console.log("qcmChoice1=" + JSON.stringify(qcmChoice1));
+
+       const requester = testContext.httpRequesterFn()
+       const resPostQcmChoice1 = await requester.post('/qcm-api/v1/public/qcm_choices')
+                     .send(qcmChoice1);
+      // console.log("qcm_choices POST status=" + resPostQcmChoice1.status);
+      expect(resPostQcmChoice1).to.have.status(201);
+      
+      console.log("qcm_choices POST result:="+ JSON.stringify(resPostQcmChoice1.body))
+  });
+}
+
+classicHttpCrudTest(testContext,mySpecificSubGroupTests);
