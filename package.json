@@ -5,7 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "mocha --exit --reporter spec",
+    "qcm_test": "mocha ./test/qcm-api.spec.js --exit --reporter spec",
+    "test": "mocha ./test/qcm-api.spec.js --exit --reporter spec",
     "start": "node server.js"
   },
   "author": "",
