@@ -244,6 +244,7 @@ async function reinit_db(){
       //console.log("old qcms deleted");
      let entitiesFromFileDataSet = await readJsonTextFile("dataset/default_qcms.json");
       for(let e of entitiesFromFileDataSet){
+		   if(e.id) { e._id = e.id; delete e.id}
         await  (new ThisPersistentModelFn()(e)).save();
       }
     return {action:"qcms collection in database re-initialized"}; //as Promise

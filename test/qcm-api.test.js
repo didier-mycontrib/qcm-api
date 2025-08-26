@@ -64,7 +64,7 @@ const mySpecificSubGroupTests =
   });
 }
 
-return classicHttpCrudInnerTestObject(testContext);
+return classicHttpCrudInnerTestObject(testContext,mySpecificSubGroupTests);
 
 }
 

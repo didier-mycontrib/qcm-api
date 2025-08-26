@@ -186,6 +186,7 @@ async function reinit_db(){
       await ThisPersistentModelFn().deleteMany( deleteAllFilter);
       let entitiesFromFileDataSet = await readJsonTextFile("dataset/default_qcm_results.json");
       for(let e of entitiesFromFileDataSet){
+		   if(e.id) { e._id = e.id; delete e.id}
         await  (new ThisPersistentModelFn()(e)).save();
       }
         return {action:"qcmResults collection in database re-initialized"}
