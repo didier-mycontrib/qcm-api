@@ -15,9 +15,11 @@ npm install --save-dev mocha chai chai-http @testcontainers/mongodb
 ======
 en mode dev,
 URL = http://localhost:8230/html/index.html
-et
-http://localhost:8230/qcm-api/public/qcm
+et    http://localhost:8230/qcm-api/v1/public/qcm
 
+en mode prod:
+URL = https://www.d-defrance.fr/qcm-api-html/index.html
+et    https://www.d-defrance.fr/qcm-api/v1/public/qcm
 
 ================
 change from mongoose 6 to mongoose 8 :
