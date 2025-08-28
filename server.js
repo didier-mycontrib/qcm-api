@@ -55,12 +55,7 @@ if(withoutAuth!="yes"){
 }
 
 const options_qcm_api = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'qcm-api',
-      version: '1.0.0',
-    },
+  definition: {   openapi: '3.0.0',   info: {  title: 'qcm-api',  version: 'v1',   },
   },
   apis: ['*-routes.js','*dao-mongoose.js'], // files containing annotations with @openapi
 };

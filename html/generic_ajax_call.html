@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title>generic_ajax_call</title>
+	<script src="js/my_ajax_util.js"></script>
+	<script src="js/generic_ajax_call.js"></script>
+</head>
+<body>
+    <h3>generic_ajax_call  <a href="" target="_blank">[new-tab]</a></h3>
+	<form>
+		<label>mode:</label><select id="selMode">
+			<option>GET</option>
+			<option>POST</option>
+			<option>PUT</option>
+			<option>DELETE</option>
+		</select><br/><br/>
+		<label>api_url + "/" + ws_end_url: </label><br/>
+		<input type="text" id="txtApiUrl" size="60" />/<input type="text" id="txtWsEndUrl" size="51"/><br/><br/>
+		<label>jsonData (for POST or PUT):</label><br/><textarea rows="3" cols="100" id="txtJsonData"></textarea><br/>
+	    <input type="button" id="btnSend" value="send" /><br/>
+	</form>
+	<hr/>
+	<i>Response (status=<span id="spanStatus">?</span>) :</i><br/>
+	<span id="spanResponse"></span>
+	<hr/>
+	<a href="index.html">retour vers index</a>
+	<hr/>
+	api_url example: <input value="http://localhost:8230/qcm-api/v1/public" size="50"/> <br/>
+	<input value="http://localhost:8230/qcm-api/v1/private" size="50"/> <br/>
+	<input value="https://www.d-defrance.fr/qcm-api/v1/public" size="50"/> <br/>
+	<input value="https://www.d-defrance.fr/qcm-api/v1/private" size="60"/> <br/>
+	ws_end_url examples: <input value="qcms" size="12"/> &nbsp; <input value="" size="12"/>&nbsp;   <br/>
+	<input value="qcms?mode=training" size="18"/>&nbsp; <input value="qcms/6215ef77a8f36f4037eeef0f?v=true" size="42"/>  <br/>
+	<input value="qcm_results" size="12"/> &nbsp;  <input value="reinit" size="22"/>  &nbsp;  <input value="reinit-results" size="22"/>  <br/>
+	jsonData example:  <input value='' size="80"/> <br/>
+	   <input value='' size="80"/> <br/>
+	   <input value='' size="160"/> <br/>
+</body>
+</html>

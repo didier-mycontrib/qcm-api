@@ -4,18 +4,23 @@
 </head>
 <body>
     <h3>URLs WS REST (mode GET , JSON)</h3>
-	<a href="../qcm-api/v1/public/qcms"> liste de tous les qcms</a><br/>
-	<a href="../qcm-api/v1/private/qcms"> tous qcms avec details</a><br/>
-	<a href="../qcm-api/v1/public/qcms?mode=training"> qcms sans details avec mode=training</a><br/>
-	<a href="../qcm-api/v1/private/qcms?mode=training"> qcms avec details avec mode=training</a><br/>
-	<a href="../qcm-api/v1/private/qcms/6215ef77a8f36f4037eeef0f"> qcm avec solutions d'id specifique </a><br/>
-	<a href="../qcm-api/v1/public/qcms/6215ef77a8f36f4037eeef0f"> qcm sans solutions d'id specifique </a><br/>
-	<a href="../qcm-api/v1/private/reinit">reinitialiser collection des qcms</a><br/>
+	<a href="../qcm-api/v1/api-docs">api-doc (swagger)</a>
+	<hr/>
+	<p>NB: toutes les URL en mode "private" seront bloquées en mode "prod" (unauthorizded)</p>
+	<p>seul un login oauth2/oidc/keycloak avec le compte d2f/d1....70-1 suivi d'un déclenchement "javascript" via "generic_ajax_call" se possible en mode sécurisé (prod)</p>
+    <a href="./logInOut.html"> logInOut </a><br/>
+	<a href="./generic_ajax_call.html"> generic_ajax_call </a><br/>
    <hr/> 
-     <a href="../qcm-api/v1/private/qcm_results"> tous qcmResults</a><br/>
-	 <a href="../qcm-api/v1/private/qcm_results/621607cd5adc0f2365d8955c"> qcmResults d'id specifique</a><br/>
-     <a href="../qcm-api/v1/private/reinit-results">reinitialiser collection des qcmResults</a><br/>
-	<hr/> 
-	<a href="../qcm-api/v1/api-docs">api-doc (swagger)</a><br/>
+	<a href="../qcm-api/v1/public/qcms"> liste de tous les qcms</a><br/>
+	<a href="../qcm-api/v1/private/qcms"> tous qcms avec details (dev only)</a><br/>
+	<a href="../qcm-api/v1/public/qcms?mode=training"> qcms sans details avec mode=training</a><br/>
+	<a href="../qcm-api/v1/private/qcms?mode=training"> qcms avec details avec mode=training (dev only)</a><br/>
+	<a href="../qcm-api/v1/private/qcms/6215ef77a8f36f4037eeef0f"> qcm avec solutions d'id specifique (dev only)</a><br/>
+	<a href="../qcm-api/v1/public/qcms/6215ef77a8f36f4037eeef0f"> qcm sans solutions d'id specifique </a><br/>
+	<a href="../qcm-api/v1/private/reinit">reinitialiser collection des qcms (dev only)</a><br/>
+   <hr/> 
+     <a href="../qcm-api/v1/private/qcm_results"> tous qcmResults (dev only)</a><br/>
+	 <a href="../qcm-api/v1/private/qcm_results/621607cd5adc0f2365d8955c"> qcmResults d'id specifique (dev only)</a><br/>
+     <a href="../qcm-api/v1/private/reinit-results">reinitialiser collection des qcmResults (dev only)</a><br/>
 </body>
 </html>
