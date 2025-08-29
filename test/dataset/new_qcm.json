@@ -9,5 +9,6 @@
                           {"txtNum":"c","text" :"python","ok": false },
                           {"txtNum":"d","text" :"c","ok": false }
                         ]}] ,
-          "solutions" : [  ]
+          "solutions" : [   {"num":1 ,"goodAnswerNums" : ["a"] } 
+                         ]
         }

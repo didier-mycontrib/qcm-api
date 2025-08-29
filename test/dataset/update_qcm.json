@@ -17,5 +17,8 @@
                           {"txtNum":"d","text" :"c","ok": false }
                         ]}
                         ] ,
-          "solutions" : [  ]
+          "solutions" : [ 
+              {"num":1 ,"goodAnswerNums" : ["a"] } ,
+              {"num":2 ,"goodAnswerNums" : ["b"] } 
+           ]
         }
